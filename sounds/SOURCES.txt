@@ -1,9 +1,53 @@
 Meme sounds in this folder — where they came from
 ================================================
 
-The 15 original sounds (whoosh, pop, ding, coin, boom, riser, airhorn,
-applause, drumroll, click, laser, success, scratch, sad-trombone, punch)
-were synthesized with numpy by generate_sounds.py — free to use, no licence.
+REAL RECORDINGS (v2.4.1) — the 16 sounds below replaced the old
+numpy-synthesized tones (generate_sounds.py). They are real recordings
+downloaded from Freesound (https://freesound.org), converted here from
+MP3 preview to 44.1 kHz mono 16-bit WAV to match the rest of the library.
+Each sound keeps its Freesound name and creator below so you can check
+its exact licence on its page (Freesound sounds are CC0, CC-BY or
+CC-BY-NC; CC-BY sounds need the creator credited when you publish).
+- whoosh.wav — "WHOOSH 1" by sound.variant
+  https://freesound.org/people/sound.variant/sounds/807304/
+- pop.wav — "Balloon Pop" by little_dog4000
+  https://freesound.org/people/little_dog4000/sounds/478764/
+- ding.wav — "bell ding 1.wav" by 5ro4
+  https://freesound.org/people/5ro4/sounds/611113/
+- coin.wav — "Coin dropped on table 5" by HoseNoseSounds
+  https://freesound.org/people/HoseNoseSounds/sounds/510735/
+- boom.wav — "Deep Cinematic Impact" by MeijstroAudio
+  https://freesound.org/people/MeijstroAudio/sounds/377303/
+- riser.wav — "Simple Riser" by SoundEffectsForAll
+  https://freesound.org/people/SoundEffectsForAll/sounds/840719/
+- airhorn.wav — "Airhorn" by jacksonacademyashmor
+  https://freesound.org/people/jacksonacademyashmor/sounds/414208/
+- applause.wav — "applause004.mp3" by tec_studio
+  https://freesound.org/people/tec_studio/sounds/361549/
+- drumroll.wav — "dramatic drum roll.wav" by ingsey101
+  https://freesound.org/people/ingsey101/sounds/51401/
+- click.wav — "Mouse Click Sound.mp3" by Pixeliota
+  https://freesound.org/people/Pixeliota/sounds/678248/
+- laser.wav — "Laser-Zap.wav" by copyc4t
+  https://freesound.org/people/copyc4t/sounds/480899/
+- success.wav — "Success Fanfare Trumpets.mp3" by FunWithSound
+  https://freesound.org/people/FunWithSound/sounds/456966/
+- scratch.wav — "Record Scratch #5" by musicvision31
+  https://freesound.org/people/musicvision31/sounds/431780/
+- sad-trombone.wav — "Sad Trombone.wav" by Benboncan
+  https://freesound.org/people/Benboncan/sounds/73581/
+- punch.wav — "Punch Hit 1.wav" by joe_anderson22
+  https://freesound.org/people/joe_anderson22/sounds/439747/
+- dun-dun-dunnn.wav — "DunDunDunnn.wav" by copyc4t
+  https://freesound.org/people/copyc4t/sounds/146434/
+
+NOTE on the 712tools batch below (section A): those 106 sounds were
+rendered offline by re-implementing 712tools.com's published Web Audio
+synth definitions with numpy, so they are synthesized sounds too (the
+site itself synthesizes every sound live in the browser from oscillators
++ noise). They are royalty-free with no samples, and they stay as they
+are: they already sound like the real meme sounds they mimic. Only the
+16 clearly fake pure-tone originals above were replaced with recordings.
 
 The 10 meme sounds below were downloaded 2026-11-15 from sfxreels.com
 (https://sfxreels.com/meme-sound-effects/). They are royalty-free
@@ -27,9 +71,9 @@ The real original "Fahh" / "Bruh" / "Emotional Damage" vocal clips are
 copyrighted samples and cannot be bundled as the originals — these
 re-creations are the legal way to get the same moments.
 
-- dun-dun-dunnn.wav — "Dun Dun Dunnn" dramatic sting (three descending notes),
-  synthesized with numpy on 2026-11-15 to complete the Auto-Edit mapping and
-  the Dramatic Moment meme template pairing. Free to use, no licence.
+- dun-dun-dunnn.wav — "DunDunDunnn.wav" by copyc4t, a real recording
+  from Freesound (replaced the numpy-synthesized version in v2.4.1).
+  See the REAL RECORDINGS section at the top of this file.
 
 ================================================================
 Second big batch — added 2026-11-15 (249 new sounds, 275 total)
