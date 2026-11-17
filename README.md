@@ -43,6 +43,12 @@ This usually means **Python is not installed**, or the app crashed and the old l
 
 **New name** - the app is now Lite Tutorial Maker. Game recording, live, replay buffer, memes, and sounds all still work exactly as before.
 
+## What's new - Real meme content v2.4.1 (Nov 2026)
+
+**🎬 Real footage meme clips** - the 100 meme video clips are now real footage, not rendered text cards. Each one is a 2.5 second cut from a free stock video on Coverr (Coverr licence: free for personal and commercial use, no attribution required): real people reacting, laughing, celebrating, falling over, real clocks and sunsets for the time cards, real gamers and board games for the gaming clips. No AI-generated video, no copyrighted viral clip or movie scene. `meme-videos/manifest.json` lists every clip with its source URL and licence, and `make_meme_videos.py` rebuilds all 100 from it.
+
+**🔊 Real recorded sounds** - the 16 original sounds (Whoosh, Pop, Ding, Coin, Boom, Riser, Airhorn, Applause, Drumroll, Click, Laser, Success, Scratch, Sad Trombone, Punch, Dun Dun Dunnn) are now real recordings from Freesound instead of numpy-synthesized tones. Same filenames, same 44.1 kHz mono WAV format, so the editor, Templates tab, and Auto-Edit keep working exactly as before. Sources are listed in `sounds/SOURCES.txt`.
+
 ## What's new — Responsive design + memes (Nov 2026)
 
 **📐 Responsive — the windows now fit any size**
@@ -51,10 +57,10 @@ This usually means **Python is not installed**, or the app crashed and the old l
 
 **🤣 Memes — templates, video clips, sounds, and Auto-Edit that adds them by itself**
 - **10 meme templates** in the Templates tab: A Few Moments Later, One Eternity Later, 2000 Years Later, Twelve Seconds Later, A Few Minutes Later, Tomorrow, To Be Continued, Bruh Moment, Emotional Damage, Dramatic Moment. (The exact SpongeBob card picture belongs to Nickelodeon, so the editor recreates the same look with its own text.)
-- **100 meme video clips** (Templates tab → "Meme videos") to drop into any video with one tap: 20 time cards, 20 reactions, 15 fails, 15 wins, 15 dramatic moments, 15 gaming moments (Headshot!, Killstreak, 1V5, 360 No Scope, GG EZ...). Each one has its sound in it already. `make_meme_videos.py` rebuilds all 100.
+- **100 meme video clips** (Templates tab → "Meme videos") to drop into any video with one tap: 20 time cards, 20 reactions, 15 fails, 15 wins, 15 dramatic moments, 15 gaming moments (Headshot!, Killstreak, 1V5, 360 No Scope, GG EZ...). Each one is real footage from free stock videos on Coverr, and each one has its sound in it already. `meme-videos/manifest.json` lists every clip's source, and `make_meme_videos.py` rebuilds all 100 from it.
 - **Make your own meme card:** type any words, pick a style, press "Make my meme card" — a new video card in seconds.
 - **Auto-Edit adds memes by itself:** it listens to your video, finds the best moments (a loud funny part, a fail, a win, a shock) and drops the right meme sound there, plus the matching meme card at the best moment. It tells you what it added. Turn it off with the "Add memes automatically" switch.
-- **329 free sounds** in the Sounds tab now (was 15): Fahh, Bruh, Emotional Damage, Dun Dun Dunnn, Vine Boom, Roblox Oof, Windows XP Error, MLG Airhorn, Metal Pipe, Wilhelm Scream, Slide Whistle, Goat Scream, Sad Violin, and 300 more from free sources (712tools, sfxreels, memesoundboards.org, myinstants — see `sounds/SOURCES.txt`). Some are copyrighted samples offered as free downloads, marked "check before commercial use". Pixabay could not be used — it blocks all automatic downloads with a bot check.
+- **329 free sounds** in the Sounds tab now (was 15): Fahh, Bruh, Emotional Damage, Dun Dun Dunnn, Vine Boom, Roblox Oof, Windows XP Error, MLG Airhorn, Metal Pipe, Wilhelm Scream, Slide Whistle, Goat Scream, Sad Violin, and 300 more from free sources (Freesound, 712tools, sfxreels, memesoundboards.org, myinstants — see `sounds/SOURCES.txt`). The 16 original sounds are real Freesound recordings now, not synthesized tones. Some are copyrighted samples offered as free downloads, marked "check before commercial use". Pixabay could not be used — it blocks all automatic downloads with a bot check.
 
 **🧪 Tested — 127 checks, all passing:** the full test suite still passes 127/127 on the final code.
 
@@ -99,7 +105,7 @@ This usually means **Python is not installed**, or the app crashed and the old l
 - **🖼️ Best Thumbnail** — looks at 16 moments in the video and saves the best frame as your thumbnail: sharp, well lit, and with a face if there is one.
 
 **🎵 Free sound effects (Sounds tab)**
-- 15 sounds, all synthesized with numpy (no samples copied from anywhere — free to use in any video): Whoosh, Pop, Ding, Coin, Boom, Riser, Airhorn, Applause, Drumroll, Click, Laser, Success, Scratch, Sad Trombone, Punch. ▶ listens, **＋ Add** puts the sound at the playhead (orange markers on the timeline), and they are mixed into the export. Import your own sounds too (mp3 / wav) — they are copied into the `sounds/` folder. `generate_sounds.py` rebuilds the library.
+- 16 core sounds, all real recordings from Freesound (CC-licensed, see `sounds/SOURCES.txt` for each sound's creator and page): Whoosh, Pop, Ding, Coin, Boom, Riser, Airhorn, Applause, Drumroll, Click, Laser, Success, Scratch, Sad Trombone, Punch, Dun Dun Dunnn. ▶ listens, **＋ Add** puts the sound at the playhead (orange markers on the timeline), and they are mixed into the export. Import your own sounds too (mp3 / wav) — they are copied into the `sounds/` folder.
 
 **✏️ Proper edit / delete (CRUD)**
 - Recent recordings: **Rename** (pencil), **Duplicate** (page icon — makes a "<name> copy.mp4") and **Delete** (trash) buttons per video — renaming/deleting/duplicating also handles the `_script.txt` / `_captions.srt` sidecars. Templates: user / imported templates have a **Delete this template** button (removes the `.json` too), and **Save my look** adds the look to the list right away (saving over the same name updates it).

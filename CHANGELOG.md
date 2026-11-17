@@ -8,10 +8,17 @@ git tag (vX.Y.Z) and a Windows release built from that tag.
 
 ## Unreleased
 
-- Meme videos and sounds: replacing the synthetic OpenCV text cards
-  and numpy-synthesized sounds with real footage and real recordings
-  from legal free sources (Pexels, Pixabay, public domain, free sound
-  libraries).
+- Real meme content: the 100 meme video clips are now real footage
+  from free stock videos on Coverr (no AI-generated video, no
+  copyrighted viral clip), cut to 2.5 s with the same filenames and
+  sounds as before. `meme-videos/manifest.json` lists every clip's
+  source URL and licence, and `make_meme_videos.py` rebuilds all 100
+  from the manifest. The 16 original sounds (whoosh, pop, ding, coin,
+  boom, riser, airhorn, applause, drumroll, click, laser, success,
+  scratch, sad-trombone, punch, dun-dun-dunnn) are now real recordings
+  from Freesound instead of numpy-synthesized tones; sources are
+  listed in `sounds/SOURCES.txt`. The editor, Templates tab, and
+  Auto-Edit work exactly as before.
 
 ## 2.4.0 - 2026-11-17
 
