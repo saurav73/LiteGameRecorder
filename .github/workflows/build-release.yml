@@ -1,0 +1,206 @@
+name: Build release
+
+# Portable builds for Windows, macOS, and Linux. One zip per OS,
+# each extracts anywhere and runs with no install: the app, FFmpeg,
+# sounds/, meme-videos/, templates/ and the README.
+#
+# Trigger: push a tag (vX.Y.Z) or run it by hand with a tag name.
+# The release job only runs when ALL three OS builds succeed, so a
+# release never ships missing an OS.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build (e.g. v2.5.0)"
+        required: true
+        default: "v2.5.0"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.os_label }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-latest
+            os_label: Windows
+            os_key: Windows
+          - runner: macos-latest
+            os_label: macOS
+            os_key: macOS
+          - runner: ubuntu-latest
+            os_label: Linux
+            os_key: Linux
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check tkinter is available
+        # The UI needs tkinter. If the runner's Python lacks it, fail
+        # here with a clear error instead of shipping a broken binary.
+        if: runner.os != 'Windows'
+        run: python -c "import tkinter; print('tkinter OK')"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+
+      - name: Build macOS icon
+        # icon.icns from icon.png (256x256). Non-fatal on purpose:
+        # the spec builds without an icon when the file is missing.
+        if: runner.os == 'macOS'
+        run: |
+          (mkdir -p LiteGameRecorder.iconset
+          sips -z 16 16 icon.png --out LiteGameRecorder.iconset/icon_16x16.png
+          sips -z 32 32 icon.png --out LiteGameRecorder.iconset/icon_16x16@2x.png
+          sips -z 32 32 icon.png --out LiteGameRecorder.iconset/icon_32x32.png
+          sips -z 64 64 icon.png --out LiteGameRecorder.iconset/icon_32x32@2x.png
+          sips -z 128 128 icon.png --out LiteGameRecorder.iconset/icon_128x128.png
+          sips -z 256 256 icon.png --out LiteGameRecorder.iconset/icon_128x128@2x.png
+          sips -z 256 256 icon.png --out LiteGameRecorder.iconset/icon_256x256.png
+          sips -z 512 512 icon.png --out LiteGameRecorder.iconset/icon_256x256@2x.png
+          sips -z 512 512 icon.png --out LiteGameRecorder.iconset/icon_512x512.png
+          sips -z 1024 1024 icon.png --out LiteGameRecorder.iconset/icon_512x512@2x.png
+          iconutil -c icns LiteGameRecorder.iconset -o icon.icns) \
+            || echo "icon build failed, continuing without one"
+          ls -la icon.icns 2>/dev/null || echo "no icon.icns, building without an icon"
+
+      - name: Build the app
+        run: python -m PyInstaller --noconfirm --clean LiteGameRecorder.spec
+
+      - name: Download FFmpeg (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+          Invoke-WebRequest -Uri $url -OutFile ffmpeg.zip
+          Expand-Archive ffmpeg.zip -DestinationPath ffmpeg-dl
+          $ffmpeg = Get-ChildItem -Recurse -Filter ffmpeg.exe ffmpeg-dl | Select-Object -First 1
+          Copy-Item $ffmpeg.FullName -Destination dist/ffmpeg.exe
+          if (Test-Path dist/ffmpeg.exe) { Write-Host "ffmpeg.exe bundled." } else { throw "ffmpeg.exe not found after download" }
+
+      - name: Download FFmpeg (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          curl -L -o ffmpeg.zip "https://evermeet.cx/ffmpeg/getrelease/zip"
+          unzip -o ffmpeg.zip -d ffmpeg-dl
+          cp ffmpeg-dl/ffmpeg dist/ffmpeg
+          chmod +x dist/ffmpeg
+          test -x dist/ffmpeg && echo "ffmpeg bundled."
+
+      - name: Download FFmpeg (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl -L -o ffmpeg.tar.xz "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"
+          mkdir ffmpeg-dl && tar -xJf ffmpeg.tar.xz -C ffmpeg-dl
+          cp ffmpeg-dl/*/ffmpeg dist/ffmpeg
+          chmod +x dist/ffmpeg
+          test -x dist/ffmpeg && echo "ffmpeg bundled."
+
+      - name: Package the release zip (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $tag = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}" } else { "${{ inputs.tag }}" }
+          $zipName = "LiteGameRecorder-$tag-Windows.zip"
+          New-Item -ItemType Directory -Force -Path package | Out-Null
+          Copy-Item dist/LiteGameRecorder.exe -Destination package/
+          Copy-Item dist/ffmpeg.exe -Destination package/
+          Copy-Item -Recurse sounds -Destination package/sounds
+          Copy-Item -Recurse meme-videos -Destination package/meme-videos
+          Copy-Item -Recurse templates -Destination package/templates
+          Copy-Item README.md -Destination package/
+          Copy-Item "UPDATE - READ ME FIRST.txt" -Destination package/ -ErrorAction SilentlyContinue
+          Compress-Archive -Path package/* -DestinationPath $zipName
+          Write-Host "Built $zipName"
+          Get-Item $zipName | Select-Object Name, Length
+          "ZIP_NAME=$zipName" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Package the release zip (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          TAG="${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}"
+          ZIP_NAME="LiteGameRecorder-$TAG-macOS.zip"
+          mkdir -p package
+          cp -R dist/LiteGameRecorder.app package/
+          cp dist/ffmpeg package/
+          cp -R sounds meme-videos templates package/
+          cp README.md package/
+          cp "UPDATE - READ ME FIRST.txt" package/ 2>/dev/null || true
+          # ditto (not zip) keeps the .app bundle's symlinks and
+          # permissions intact.
+          cd package && ditto -c -k --sequesterRsrc . "../$ZIP_NAME"
+          cd ..
+          ls -la "$ZIP_NAME"
+          echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
+
+      - name: Package the release zip (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          TAG="${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}"
+          ZIP_NAME="LiteGameRecorder-$TAG-Linux.zip"
+          mkdir -p package
+          cp dist/LiteGameRecorder package/
+          cp dist/ffmpeg package/
+          cp -R sounds meme-videos templates package/
+          cp README.md package/
+          cp "UPDATE - READ ME FIRST.txt" package/ 2>/dev/null || true
+          chmod +x package/LiteGameRecorder package/ffmpeg
+          cd package && zip -qr "../$ZIP_NAME" .
+          cd ..
+          ls -la "$ZIP_NAME"
+          echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
+
+      - name: Upload zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LiteGameRecorder-${{ matrix.os_key }}
+          path: ${{ env.ZIP_NAME }}
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all zips
+        uses: actions/download-artifact@v4
+        with:
+          pattern: LiteGameRecorder-*
+          path: dist-zips
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+          name: Lite Tutorial Maker ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+          body: |
+            Portable builds of Lite Tutorial Maker for Windows, macOS, and Linux. No install needed.
+
+            **Windows:** download `LiteGameRecorder-*-Windows.zip`, extract it anywhere, double-click `LiteGameRecorder.exe`.
+
+            **macOS:** download `LiteGameRecorder-*-macOS.zip`, extract it, move the folder out of Downloads, then double-click `LiteGameRecorder.app`. The first run may need a right-click, Open (the app is not signed).
+
+            **Linux:** download `LiteGameRecorder-*-Linux.zip`, extract it anywhere, run `./LiteGameRecorder`. Needs X11 (or XWayland) for screen capture.
+
+            Every zip has FFmpeg bundled, so sound works out of the box, plus the sounds (329), meme videos (100), and templates. Your settings (config.json) and recordings stay next to the app, so the whole folder is portable, including on a USB stick.
+
+            Updates: once installed, the app checks for new versions and can update itself in place (Help menu, Check for updates). No need to download the full zip again.
+          files: dist-zips/*.zip
+          draft: false
+          prerelease: false
