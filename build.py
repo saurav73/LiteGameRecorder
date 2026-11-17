@@ -6,7 +6,7 @@ Output: dist/LiteGameRecorder  (or .exe on Windows, .app on macOS with --app)
 
 This replaces the old Windows-only build_exe.bat. PyInstaller runs on
 Windows, macOS and Linux and produces a native binary for that OS.
-For all three at once, see .github/workflows/build.yml (GitHub Actions).
+For all three at once, see .github/workflows/build-release.yml (GitHub Actions).
 """
 import subprocess
 import sys
