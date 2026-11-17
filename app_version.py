@@ -5,6 +5,6 @@ release bump is one line in this file plus a matching git tag.
 Never hardcode the version anywhere else.
 """
 
-__version__ = "2.4.0"
+__version__ = "2.4.1"
 APP_NAME = "Lite Tutorial Maker"
 APP_DISPLAY_NAME = f"{APP_NAME} v{__version__}"

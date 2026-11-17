@@ -8,6 +8,10 @@ git tag (vX.Y.Z) and a Windows release built from that tag.
 
 ## Unreleased
 
+(nothing yet)
+
+## 2.4.1 - 2026-11-17
+
 - Fixed: the video editor now runs in its own process. Opening the
   editor from the recorder and then closing the recorder used to
   kill both tools, because the editor was a child window of the
