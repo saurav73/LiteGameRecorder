@@ -9,6 +9,10 @@ built from that tag.
 
 ## Unreleased
 
+(nothing yet)
+
+## 2.5.0 - 2026-11-17
+
 - Multi-OS portable builds: one GitHub Actions matrix build now
   produces a portable zip for Windows, macOS, and Linux. Each zip
   extracts anywhere and runs with no install (app + FFmpeg +
