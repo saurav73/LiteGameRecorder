@@ -38,6 +38,7 @@ import datetime
 import traceback
 import shutil
 import subprocess
+import webbrowser
 from pathlib import Path
 
 import tkinter as tk
@@ -2996,6 +2997,10 @@ class App(ctk.CTk):
             self._hotkeys.start()
         except Exception:
             self._hotkeys = None
+        # Update check, once a day at most: a few seconds after the
+        # window is up, in a background thread, silent unless a newer
+        # version is actually available.
+        self.after(3000, self._auto_update_check)
 
     # ---------- UI construction ----------
     def _card(self, parent, title):
@@ -3218,6 +3223,7 @@ class App(ctk.CTk):
         m = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Help", menu=m)
         m.add_command(label="Keyboard shortcuts", command=self._show_shortcuts)
+        m.add_command(label="Check for updates…", command=self._manual_update_check)
         m.add_command(label="About Lite Tutorial Maker", command=self._show_about)
 
     def _show_shortcuts(self):
@@ -3245,6 +3251,210 @@ class App(ctk.CTk):
             "trim, split, speed, filters, text, stickers, transitions,\n"
             "9:16 vertical, background music, auto captions\n\n"
             "Light mode keeps it fast on weak laptops.")
+
+    # ---------- auto-updater ----------
+    def _auto_update_check(self):
+        """Startup check, at most once a day. Silent unless a newer
+        version with a build for this OS is actually available."""
+        try:
+            if self.cfg.get("update_last_check") == datetime.date.today().isoformat():
+                return
+        except Exception:
+            pass
+        threading.Thread(target=self._update_check_thread, args=(False,),
+                         daemon=True).start()
+
+    def _manual_update_check(self):
+        """Help menu > Check for updates. Always reports the result."""
+        threading.Thread(target=self._update_check_thread, args=(True,),
+                         daemon=True).start()
+
+    def _update_check_thread(self, manual):
+        try:
+            import updater
+            result = updater.check_for_update()
+        except Exception as exc:
+            result = {"available": False, "latest": None, "url": None,
+                      "asset": None, "size": None, "no_asset": False,
+                      "error": "Could not check for updates (%s)." % exc}
+        try:
+            self.after(0, lambda: self._update_check_done(result, manual))
+        except Exception:
+            pass
+
+    def _update_check_done(self, result, manual):
+        # A successful check stamps today, so the automatic check
+        # runs at most once a day. A failed check stamps nothing, so
+        # the next startup tries again.
+        if not result.get("error"):
+            try:
+                self.cfg["update_last_check"] = datetime.date.today().isoformat()
+                save_config(self.cfg)
+            except Exception:
+                pass
+        if result.get("error"):
+            if manual:
+                messagebox.showinfo("Check for updates", result["error"])
+            return
+        if not result.get("available"):
+            if manual:
+                messagebox.showinfo(
+                    "Check for updates",
+                    "You are on the latest version (v%s)." % __version__)
+            return
+        latest = result["latest"]
+        if result.get("no_asset"):
+            if manual:
+                messagebox.showinfo(
+                    "Check for updates",
+                    "Version %s is out, but there is no build for this "
+                    "operating system yet. Check the releases page later."
+                    % latest)
+            return
+        size = result.get("size")
+        size_txt = (" (%.0f MB)" % (size / 1048576)) if size else ""
+        if not getattr(sys, "frozen", False):
+            # Source checkout: no in-place update, point at releases.
+            if messagebox.askyesno(
+                    "Update available",
+                    "Version %s is available%s. You are running from "
+                    "source, so this copy cannot update itself.\n\n"
+                    "Open the releases page in your browser to get it?"
+                    % (latest, size_txt)):
+                try:
+                    import updater
+                    webbrowser.open(updater.RELEASES_PAGE)
+                except Exception:
+                    pass
+            return
+        if messagebox.askyesno(
+                "Update available",
+                "Version %s is available%s.\n\n"
+                "Update now? The app will download it, restart, and "
+                "come back on the new version. Your settings and "
+                "recordings are kept."
+                % (latest, size_txt)):
+            self._start_update(result)
+
+    def _start_update(self, result):
+        """Download the update with a progress dialog, then hand over
+        to the updater helper and quit so it can swap the files."""
+        if self.recorder and self.recorder.recording:
+            messagebox.showwarning(
+                "Recording in progress",
+                "Stop the recording first, then update.")
+            return
+        if (self._editor_proc is not None
+                and self._editor_proc.poll() is None):
+            messagebox.showwarning(
+                "Video editor is open",
+                "Close the video editor first, then update. The editor "
+                "runs from the same app files the update replaces.")
+            return
+        dlg = ctk.CTkToplevel(self)
+        dlg.title("Updating Lite Tutorial Maker")
+        dlg.geometry("440x190")
+        dlg.resizable(False, False)
+        dlg.transient(self)
+        dlg.grab_set()
+        ctk.CTkLabel(dlg, text="Updating to version %s" % result["latest"],
+                     font=("Segoe UI", 14, "bold")).pack(padx=16, pady=(16, 4))
+        status_var = tk.StringVar(value="Starting download…")
+        ctk.CTkLabel(dlg, textvariable=status_var,
+                     font=("Segoe UI", 11), text_color=MUTED,
+                     wraplength=400).pack(padx=16, pady=4)
+        bar = ctk.CTkProgressBar(dlg, width=380)
+        bar.pack(padx=16, pady=8)
+        bar.set(0)
+        state = {"cancelled": False, "done": False}
+
+        def _set_status(text):
+            try:
+                status_var.set(text)
+            except Exception:
+                pass
+
+        def _set_progress(frac):
+            try:
+                bar.set(max(0.0, min(1.0, frac)))
+            except Exception:
+                pass
+
+        def _finish_failed(text):
+            _set_status(text)
+            try:
+                cancel_btn.configure(text="Close",
+                                     command=dlg.destroy)
+                dlg.protocol("WM_DELETE_WINDOW", dlg.destroy)
+            except Exception:
+                pass
+
+        def _cancel():
+            if state["done"]:
+                try:
+                    dlg.destroy()
+                except Exception:
+                    pass
+                return
+            state["cancelled"] = True
+            _set_status("Cancelling…")
+
+        cancel_btn = ctk.CTkButton(dlg, text="Cancel", width=100,
+                                   command=_cancel)
+        cancel_btn.pack(pady=(4, 12))
+        dlg.protocol("WM_DELETE_WINDOW", _cancel)
+        threading.Thread(
+            target=self._update_run_thread,
+            args=(result, state, _set_status, _set_progress,
+                  _finish_failed),
+            daemon=True).start()
+
+    def _update_run_thread(self, result, state, set_status,
+                           set_progress, finish_failed):
+        """The download + apply work, off the UI thread. UI updates go
+        through after(0, ...) so they run on the main thread."""
+        import updater
+
+        def _ui(fn):
+            try:
+                self.after(0, fn)
+            except Exception:
+                pass
+
+        tmp_dir = Path(tempfile.mkdtemp(prefix="lgr-update-dl-"))
+        tmp_zip = tmp_dir / "update.zip"
+        try:
+            def _progress(done, total):
+                if state["cancelled"]:
+                    return
+                if total:
+                    _ui(lambda: (set_progress(done / total),
+                                 set_status("Downloading… %d%%"
+                                            % (done * 100 // total))))
+                else:
+                    _ui(lambda: set_status(
+                        "Downloading… %.1f MB" % (done / 1048576)))
+
+            updater.download(result["url"], tmp_zip, progress=_progress,
+                             cancel=lambda: state["cancelled"])
+            _ui(lambda: set_status("Checking the download…"))
+            ok, err = updater.validate_zip(tmp_zip)
+            if not ok:
+                raise updater.UpdateError(err)
+            _ui(lambda: set_status("Preparing the update…"))
+            ok, err = updater.apply_update(tmp_zip)
+            if not ok:
+                raise updater.UpdateError(err)
+            state["done"] = True
+            _ui(lambda: set_status("Restarting into the new version…"))
+            # Quit so the helper can replace the files and relaunch.
+            _ui(lambda: self.after(800, self._on_close))
+        except updater.UpdateCancelled:
+            _ui(lambda: finish_failed("Update cancelled."))
+        except Exception as exc:
+            _ui(lambda: finish_failed("Update failed: %s" % exc))
+        finally:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
 
     def _build_ui(self):
         # Vars used by the header/status row AND the menu - created
