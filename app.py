@@ -2943,6 +2943,10 @@ class App(ctk.CTk):
         self._idle_cap = None
         self._hotkeys = None
         self._live_on = False
+        # v2.4 - screen annotation overlay (created on demand)
+        self._annot_overlay = None
+        self._annot_canvas = None
+        self._annot_last = None
 
         self._build_ui()
         self._load_cfg_to_ui()
@@ -3390,6 +3394,19 @@ class App(ctk.CTk):
                                          font=("Segoe UI", 18), width=56, height=56, corner_radius=18)
         self.chapter_btn.pack(side="left", padx=6)
         ToolTip(self.chapter_btn, "Mark a chapter here (M).\nChapters are saved next to the video and show on the editor timeline, where you can rename them.")
+        # v2.4 - screen annotation: draw a yellow highlight on the
+        # screen while recording. The drawing is on the screen, so
+        # the recorder captures it like anything else.
+        self.annotate_btn = ctk.CTkButton(_bc, text="✏️", command=self._toggle_annotate, state="disabled",
+                                          fg_color=PANEL2, hover_color=BORDER, text_color=TEXT,
+                                          font=("Segoe UI", 18), width=56, height=56, corner_radius=18)
+        self.annotate_btn.pack(side="left", padx=6)
+        ToolTip(self.annotate_btn, "Draw on the screen while recording.\nDrag to draw a yellow highlight. Press Esc (or this button again) to stop drawing and click normally.")
+        self.annot_clear_btn = ctk.CTkButton(_bc, text="🗑", command=self._clear_annotations, state="disabled",
+                                             fg_color=PANEL2, hover_color=BORDER, text_color=TEXT,
+                                             font=("Segoe UI", 18), width=56, height=56, corner_radius=18)
+        self.annot_clear_btn.pack(side="left", padx=6)
+        ToolTip(self.annot_clear_btn, "Clear the drawing from the screen.\nStrokes already recorded stay in the video; clearing only stops them showing from now on.")
         _br = ctk.CTkFrame(transport, fg_color="transparent")
         _br.grid(row=0, column=2, sticky="e", padx=14, pady=12)
         rec_btn = ctk.CTkButton(_br, text="📂  Recordings", command=self._open_folder,
@@ -4293,6 +4310,7 @@ class App(ctk.CTk):
                           hover_color=BORDER, corner_radius=18, state="normal")
         self.pause_btn.configure(state="normal")
         self.chapter_btn.configure(state="normal")
+        self.annotate_btn.configure(state="normal")
         self._update_live_badge()
 
     def toggle_pause(self):
@@ -4320,6 +4338,87 @@ class App(ctk.CTk):
                 f"Chapter marked: {ch['title']} at {format_chapter_time(ch['time'])} "
                 f"({len(self.recorder.chapters)} so far) — rename it in the editor")
 
+    # ---------- screen annotation (v2.4) ----------
+    # A transparent fullscreen overlay: the user draws a yellow
+    # highlight on it, and the screen capture records the drawing
+    # like anything else on the screen. No recorder changes were
+    # needed: the overlay IS the annotation. While it is up, mouse
+    # clicks go to the overlay (that is how drawing works), so Esc
+    # or the button hides it again to click normally.
+
+    def _toggle_annotate(self):
+        if self._annot_overlay is not None:
+            self._hide_annotate()
+            return
+        if not (self.recorder and self.recorder.recording):
+            return
+        ov = ctk.CTkToplevel(self)
+        ov.attributes("-fullscreen", True)
+        ov.attributes("-topmost", True)
+        try:
+            # Windows only: make the background colour see-through
+            # so only the yellow strokes show on screen.
+            ov.attributes("-transparentcolor", "white")
+        except Exception:
+            ov.destroy()
+            messagebox.showinfo(
+                "Annotation is not available",
+                "Screen annotation needs Windows (it uses a transparent overlay).\n\n"
+                "On this system the overlay cannot be made transparent, so drawing would cover the screen.")
+            return
+        ov.configure(fg_color="white")
+        canvas = tk.Canvas(ov, bg="white", highlightthickness=0, cursor="pencil")
+        canvas.pack(fill="both", expand=True)
+        self._annot_overlay = ov
+        self._annot_canvas = canvas
+        self._annot_last = None
+
+        def down(e):
+            self._annot_last = (e.x, e.y)
+
+        def drag(e):
+            if self._annot_last is None:
+                self._annot_last = (e.x, e.y)
+                return
+            x0, y0 = self._annot_last
+            canvas.create_line(x0, y0, e.x, e.y, fill="#FFD166", width=5,
+                               capstyle="round", joinstyle="round")
+            self._annot_last = (e.x, e.y)
+
+        def up(_e):
+            self._annot_last = None
+
+        canvas.bind("<ButtonPress-1>", down)
+        canvas.bind("<B1-Motion>", drag)
+        canvas.bind("<ButtonRelease-1>", up)
+        ov.bind("<Escape>", lambda e: self._hide_annotate())
+        ov.focus_force()
+        self.annotate_btn.configure(fg_color=AMBER, text_color="#0F1218")
+        self.annot_clear_btn.configure(state="normal")
+        self.status_var.set("Drawing on the screen — drag to highlight. Press Esc to stop drawing and click normally.")
+
+    def _hide_annotate(self):
+        if self._annot_overlay is not None:
+            try:
+                self._annot_overlay.destroy()
+            except Exception:
+                pass
+            self._annot_overlay = None
+            self._annot_canvas = None
+            self._annot_last = None
+        self.annotate_btn.configure(fg_color=PANEL2, text_color=TEXT)
+        self.annot_clear_btn.configure(state="disabled")
+        if self.recorder and self.recorder.recording:
+            self.status_var.set("Recording…")
+
+    def _clear_annotations(self):
+        if self._annot_canvas is not None:
+            try:
+                self._annot_canvas.delete("all")
+            except Exception:
+                pass
+            self.status_var.set("Drawing cleared — strokes already recorded stay in the video.")
+
     def _on_status(self, elapsed=None, dropped=None, written=None, done=False, path=None, mic_active=None, note="", phase=None):
         def ui():
             if phase == "fixing":
@@ -4334,6 +4433,8 @@ class App(ctk.CTk):
                                   state="normal")
                 self.pause_btn.configure(state="disabled", text="⏸")
                 self.chapter_btn.configure(state="disabled")
+                self._hide_annotate()
+                self.annotate_btn.configure(state="disabled")
                 self._session_file_var.set("")
                 self._update_session_card()
                 self.rec_dot.configure(text_color=MUTED)
@@ -4412,6 +4513,7 @@ class App(ctk.CTk):
         self.after(interval, self._preview_tick)
 
     def _on_close(self):
+        self._hide_annotate()
         if self.recorder and self.recorder.recording:
             if not messagebox.askokcancel("Recording in progress", "Stop recording and close? The video will be saved."):
                 return
