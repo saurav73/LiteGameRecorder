@@ -38,6 +38,8 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+from app_version import get_app_dir
+
 import wave
 
 import cv2
@@ -158,7 +160,7 @@ def sfx_library():
              "8-bit-blip", "8-bit-bonus", "8-bit-explosion", "8-bit-hurt", "achievement", "acoustic-guitar-strum", "adopt-me-cash", "air-horn", "alarm-clock", "alien-mystery-sting", "alien-mystery-theme", "among-us-kill", "anatoxic-garamararamararaman", "arcade-button", "arrow-whoosh", "arsenal-headshot", "arsenal-kill", "atm-beep", "aughhh", "autodarts-bonus-cricket", "aww", "balloon-pop", "baseball-catch", "bass-guitar", "beep-medical", "beep-morse", "bell-chime", "bell-prank", "blox-fruits-level-up", "bo-womp", "body-fall-thud", "boi", "boing", "boing-spring", "bongo-drum", "bonk", "bonk-meme", "boo-scary", "boo-womp-spongebob", "boxing-bell", "brainrot-cat", "brookhaven-doorbell", "bruh-meme-sound-effect", "buzzer-wrong", "camera-flash", "camera-shutter", "capuccino-assasino-italian-brainrot", "car-alarm", "car-crash", "car-horn", "cartoon-boing", "cartoon-metallic-stomp", "cartoon-slap", "cartoony-bash", "cash-register", "cash-register-cha-ching", "censor-beep", "checkpoint", "chicken-jockey-a-minecraft-movie-clean-audio", "cinematic-hit", "cinematic-whoosh", "classic-fart", "clock-ticking", "clown-horn-short", "coin-pickup", "conga-drum", "core-bass-hit", "cough", "count-up", "cowbell", "cricket", "cricket-bat-hitting-sound", "crickets-awkward-silence", "crow-caw", "crowd-boo", "crowd-chant", "digital-glitch", "discord-message-notification", "discord-notification", "discord-ping", "discordmute", "distant-scream", "dj-scratch", "door-knock", "doubt-music", "downlifter", "dramatic-sting", "duck-quack", "dun-dun-dun", "e2-error", "electric-zap", "email-notify", "emotional-damage-meme", "epic-choir", "epic-fail-flute", "epic-hit", "erichorn", "erm-what-the-sigma-full", "error-buzz", "error-tone", "explosion", "extra-life", "face-slap", "fake-laugh", "fart", "final-credit-music", "fire-alarm", "fire-crackle", "flatline", "footsteps", "fox-scream", "frog-croak", "game-over", "gary-meow", "gasp", "glitch", "glitch-transition", "goat-scream", "goofy-honk", "goofy-yeha-yeehaa-yeeha-yehaa-ohio-sigma-skibidi", "goose-honk", "gruneme-shrek", "hand-slap", "heartbeat", "hesitation", "hiccup", "hit-8bit", "hollow-metallic-head-konk-and-horn", "huh-cat-meme", "huh-roblox", "im-outta-here-sonic-cd", "jailbreak-siren", "jixaw-metal-pipe-falling-sound", "jump", "jump-8bit", "jump-landing", "jumpscare-scream", "kazoo", "keyboard-type", "keypad-beep", "kick-drum", "laser-blast", "laser-zap", "laugh-track", "lemmings-bonk", "level-up", "light-switch", "loud-dramatic-stinger", "loud-fart", "magic-wand", "mario-big-jump-sound-effect", "mario-meow", "mateooo-italian-brainrot", "menu-close", "menu-open", "meowl-steal-a-brainrot", "message-pop", "metal-pipe", "metal-pipe-vine-boom", "metallic-riser", "minecraft-oof-no-delay", "mission-complete", "mlg-air-horn-sound", "mlg-airhorn", "money-count", "murder-mystery-gun", "negative-beep", "nervous-giggle", "new-notification", "nintendo-switch-error", "noob-oof-sound", "notification-ding", "oh-my-god-bro-ah-hell-nah", "orchestra-hit", "ouch", "paper-flip", "pc-shutdown-chime", "penguin", "perfect-fart", "phone-ring", "piggy-chase-music", "piggy-jumpscare", "ping-pong", "portal-warp", "power-down", "power-up", "price-is-right-losing-trombone", "proper-clown-short-horn", "psst-roblox-doors", "quack", "quick-fart", "rain", "record-scratch", "retro-game-over", "retro-hero-horns", "retro-laser", "reverse-whoosh", "reward", "rewind-fail-fx", "rimshot", "rise-riser", "riser-quick", "rizzbot-laugh", "roblox-cash-register", "roblox-death-sound-oof", "roblox-drinking-potion", "roblox-error", "roblox-game-over", "roblox-hurt", "roblox-jumping", "roblox-level-up", "roblox-oof", "roblox-sword-swing", "roblox-victory-fanfare", "roblox-walking", "romance-music-meme", "rubber-chicken", "run-music", "sad-violin", "scared-scream", "scream", "select-menu", "shoot-blaster", "short-fart", "shrek-do-the-roar", "shrek-roar", "sigh", "siren", "siren-whistle", "skibidi-toilet-steal-a-brainrot", "slap", "slap-quandale-dingle", "slide-whistle", "slide-whistle-down", "slide-whistle-up", "slot-lever", "slow-clap", "slurp", "snare-drum", "sneeze", "snoring", "snort-laugh", "sonic-cd-jump", "sparkle-magic", "spongebob-fail", "spongebob-transition", "squeak", "startup-chime", "steal-a-brainrot-dragon-cannelloni", "steam-train-chuff", "stopwatch-beep", "submarine-ping", "success-chime", "sudden-suspense-boom", "surprise", "sus", "sus-violin", "suspense", "swipe", "swipe-transition", "swoosh", "tada", "tap", "tape-rewind", "text-message", "thunder", "ticking-clock", "toggle-off", "toggle-on", "toggle-switch", "toilet-ananas-nasdas", "tralalero-tralala-meme", "trollface-smile", "trullimero-trullicina", "typewriter", "vibraslap", "vine-boom", "vine-boom-bass-boosted-man", "vine-boom-meme", "vine-boom-spam", "warning-beep", "water-drop", "west-coast-groove", "wet-fart", "whistle-catcall", "whoosh-cinematic", "whoosh-snap", "whoosh-transition", "why-are-you-running", "wilhelm-scream", "wind", "windows-vista-chord-sound-effect", "windows-xp-critical-error-full-version", "windows-xp-error", "windows-xp-fail", "woman-scream", "wow", "yay", "yeet", "zelda-navi-hello", "zoom", "zoom-in", "zoom-out"]
     cands = []
     try:
-        cands.append(Path(__file__).resolve().parent / "sounds")
+        cands.append(get_app_dir() / "sounds")
     except Exception:
         pass
     try:
@@ -472,7 +474,7 @@ def _meme_video_folders():
     next to the frozen .exe)."""
     cands = []
     try:
-        cands.append(Path(__file__).resolve().parent / "meme-videos")
+        cands.append(get_app_dir() / "meme-videos")
     except Exception:
         pass
     try:
@@ -702,7 +704,7 @@ def _find_tool(name):
     except Exception:
         pass
     try:
-        app_dir = Path(__file__).resolve().parent
+        app_dir = get_app_dir()
         cands.append(app_dir / (name + (".exe" if sys.platform == "win32" else "")))
         cands.append(app_dir / name)
     except Exception:
@@ -1717,7 +1719,7 @@ def _key_path():
     if _KEY_FILE_OVERRIDE is not None:
         return Path(_KEY_FILE_OVERRIDE)
     try:
-        app_dir = Path(__file__).resolve().parent
+        app_dir = get_app_dir()
     except Exception:
         app_dir = Path.cwd()
     return app_dir / "openrouter_key.txt"
@@ -4339,7 +4341,7 @@ class VideoEditor(ctk.CTkToplevel):
         # Keep a copy with the app's sounds so it survives a move.
         try:
             dest_dir = None
-            for cand in (Path(__file__).resolve().parent / "sounds",
+            for cand in (get_app_dir() / "sounds",
                          Path(sys.executable).parent / "sounds"):
                 try:
                     cand.mkdir(exist_ok=True)
@@ -4521,7 +4523,7 @@ class VideoEditor(ctk.CTkToplevel):
             return
         TEMPLATES.pop(name, None)
         plain = name[3:].strip() if name.startswith("📥") else name
-        for folder in (Path(__file__).resolve().parent / "templates",
+        for folder in (get_app_dir() / "templates",
                        Path(sys.executable).parent / "templates"):
             if not folder.is_dir():
                 continue
@@ -4620,7 +4622,7 @@ class VideoEditor(ctk.CTkToplevel):
         dropped there show up automatically."""
         folders = []
         try:
-            folders.append(Path(__file__).resolve().parent / "templates")
+            folders.append(get_app_dir() / "templates")
         except Exception:
             pass
         try:

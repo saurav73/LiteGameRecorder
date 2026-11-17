@@ -39,7 +39,12 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-HERE = Path(__file__).resolve().parent
+from app_version import get_app_dir
+
+# The app folder (next to the exe when frozen, the project root from
+# source), so the editor's custom-card box finds the sounds and the
+# meme-videos folder in a portable install too.
+HERE = get_app_dir()
 OUT = HERE / "meme-videos"
 SOUNDS = HERE / "sounds"
 MANIFEST = OUT / "manifest.json"

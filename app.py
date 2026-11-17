@@ -43,6 +43,8 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
+from app_version import APP_DISPLAY_NAME as APP_NAME, __version__, get_app_dir
+
 try:
     import customtkinter as ctk
     HAS_CTK = True
@@ -55,7 +57,7 @@ except Exception as e:
     _err = f"Could not load the design library (customtkinter): {type(e).__name__}: {e}\n{_tb.format_exc()}"
     print(_err, file=sys.stderr)
     try:
-        with open(Path(__file__).resolve().parent / "error.log", "w", encoding="utf-8") as _f:
+        with open(get_app_dir() / "error.log", "w", encoding="utf-8") as _f:
             _f.write(_err)
     except Exception:
         pass
@@ -98,8 +100,6 @@ try:
 except Exception:
     HAS_MIC = False
 
-from app_version import APP_DISPLAY_NAME as APP_NAME, __version__
-
 # RTMP ingest URLs. The stream key is yours - never share it.
 # YouTube / Twitch / Facebook / Kick all speak RTMP, so "any platform"
 # just means: pick the preset, paste your key, go live.
@@ -117,7 +117,7 @@ LIVE_HELP = {
     "Kick":     "Kick Dashboard > Settings > Stream Key > copy it",
     "Custom":   "Paste the full RTMP URL your platform gave you, plus its stream key",
 }
-APP_DIR = Path(__file__).resolve().parent
+APP_DIR = get_app_dir()
 CONFIG_PATH = APP_DIR / "config.json"
 DEFAULT_OUTPUT = Path.home() / "Videos" / "GameRecorder"
 
@@ -995,7 +995,7 @@ def find_ffmpeg():
     except Exception:
         pass
     try:
-        app_dir = Path(__file__).resolve().parent
+        app_dir = get_app_dir()
         cands += [app_dir / "ffmpeg.exe", app_dir / "ffmpeg",
                   app_dir / "ffmpeg" / "ffmpeg.exe", app_dir / "ffmpeg" / "ffmpeg"]
     except Exception:
@@ -2946,6 +2946,7 @@ class App(ctk.CTk):
         self.minsize(1000, 650)
         self.configure(fg_color=BG)
         self.recorder = None
+        self._editor_proc = None  # the video editor process, if launched
         self._preview_photo = None
         self._idle_cap = None
         self._hotkeys = None
@@ -3889,12 +3890,12 @@ class App(ctk.CTk):
                 # since editor.py does not exist as a file there.
                 cmd = [sys.executable, "--editor"]
             else:
-                editor_py = Path(__file__).resolve().parent / "editor.py"
+                editor_py = get_app_dir() / "editor.py"
                 cmd = [sys.executable, str(editor_py)]
             if path:
                 cmd.append(str(path))
-            subprocess.Popen(
-                cmd, cwd=str(Path(__file__).resolve().parent),
+            self._editor_proc = subprocess.Popen(
+                cmd, cwd=str(get_app_dir()),
                 **_quiet_subprocess_kwargs())
         except Exception as exc:
             messagebox.showerror("Video Editor",
