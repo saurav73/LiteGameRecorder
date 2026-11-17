@@ -1,0 +1,17 @@
+{
+  "name": "Golden Hour Glow",
+  "desc": "Warm sunset light, soft and golden — for travel and memories",
+  "ratio": "9:16  Vertical (TikTok / Reels)",
+  "transition": "Dissolve",
+  "speed": 1.0,
+  "filter": "Warm",
+  "text_color": "Yellow",
+  "text_anim": "Fade in",
+  "clip_anim": "Zoom in",
+  "captions": false,
+  "caption_style": "Normal",
+  "ramp": "None",
+  "letterbox": false,
+  "grain": true,
+  "border": false
+}

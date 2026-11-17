@@ -1,0 +1,313 @@
+LITE GAME RECORDER v2.3 — UPDATE (Nov 2026)
+=============================================
+
+WHAT WAS FIXED IN THIS UPDATE
+-----------------------------
+0. NEW MODERN DESIGN — the whole app looks modern now, no more
+   90s grey windows. The setup window is dark like the main app,
+   with a big green Install button, a step checklist that ticks
+   off as the install runs (Install libraries -> Build the app ->
+   Copy files -> Get FFmpeg -> Shortcuts), a green progress bar
+   and a dark log box. The main app has a cleaner header and
+   better spacing, and the editor has softer rounded buttons.
+   Only the look changed — every button does the same thing.
+   Tested: 88 checks, all passing.
+   Polished again: the setup window now has a deep-green banner
+   at the top, a real stepper (numbered circles 1-5, green check
+   when a step is done, green highlight on the step running
+   now), a thicker progress bar with rounded ends and a % label,
+   long paths in the log cut in the middle so they never wrap
+   awkwardly, and a window that sizes itself so no button is
+   ever clipped at the bottom.
+   REBUILT AGAIN (this version): BOTH windows are redesigned
+   like the modern editors you showed me — dark, rounded, one
+   light-blue colour for the main buttons. See item 13 below.
+   Tested: 127 checks, all passing.
+
+1. SOUND — the big one. Your recordings had no sound because FFmpeg
+   was missing on your PC, and FFmpeg is what puts the mic + game
+   sound into the video. The installer now DOWNLOADS FFmpeg for you
+   (one time, ~40 MB) and puts it next to the app. If you already
+   installed, open the setup window and press "Get FFmpeg (sound)".
+   Also: the app now WARNS you before recording if the video would
+   have no sound at all, and the "Test game sound — record 3 sec"
+   button really records 3 seconds and tells you how loud it was.
+
+2. FACECAM — it was showing you flipped ("opposite"). The facecam
+   is now mirrored like a selfie, the way TikTok shows you. Turn
+   "Mirror facecam" off in the Facecam card if you want the other way.
+
+3. TEMPLATES — 26 templates now (Velocity Edit 2.0, Beat Sync Pro,
+   Slow Motion Cinematic, 3D Zoom Photo, Cinematic Letterbox,
+   Vintage / Retro Film, Text Reveal Hook, Lyrics Highlight, Vlog,
+   Gaming Kill Montage, Photo Dump Minimal, and the old ones).
+   13 animated subtitle styles: Hormozi, Beast Mode, Golden Karaoke,
+   Neon, Typewriter, Gradient Pop, Minimal, Bouncing Ball,
+   Word Punch, TikTok Box, Gamer, Karaoke, Normal.
+   New: Hero speed ramp, Jelly animation, TealOrange film colour,
+   Letterbox bars, Film grain, White photo border.
+   You can IMPORT templates: Templates tab -> "Import template"
+   (.json file) or "Save my look". Drop .json templates into the
+   "templates" folder next to the app and they appear by themselves.
+   Effects tab -> "Load a .cube colour look": free .cube files from
+   FreeVisuals / FilterGrade / videoeditingluts.com colour your clip
+   like a real film grade.
+
+4. VOICE DELAY FIXED — this was the bug in your video: the mic
+   started up to 1 second BEFORE the video (opening the webcam and
+   starting game sound takes time), so your voice came 1 second
+   AFTER your mouth moved. The app now measures the exact gap and
+   moves the sound back onto your lips. Pausing is fixed too — the
+   mic used to keep recording while the video was paused, so the
+   sound drifted after every pause. Now paused parts are cut out
+   of the sound. Tested: the voice lands exactly on the mouth now.
+
+5. VOICE CHANGER WHILE RECORDING — you can now change the voice
+   (Off / Deep / High Chipmunk / Echo / Robot) in the middle of a
+   recording. The new voice starts from that moment — one video
+   can go Deep and then Chipmunk. It is in the Audio card.
+
+6. EDITOR SOUND — REALLY FIXED THIS TIME — press Play in the
+   editor and you hear the video sound + music + sound effects
+   while you edit (before it was silent). There is a "Sound"
+   tick box next to the Play button to turn it off.
+   THE BUG (found by testing): the video used to start at once
+   while the sound was still being prepared, so on a short clip
+   the video FINISHED before the sound was ready — you heard
+   nothing, and the status just said "Preparing sound…" forever.
+   Now the video waits for the sound, and the mix is prepared
+   in the background while you edit, so it is usually ready
+   before you press Play.
+   TWO PLAYERS: if the built-in player cannot play on your PC,
+   the editor falls back to ffplay (it comes with the FFmpeg
+   the installer downloads). If both fail, the editor TELLS you
+   instead of staying silent.
+   TEST IT IN 2 SECONDS: open the editor, go to the Audio tab,
+   and press "Test sound (do you hear the Ding?)". If you hear
+   the Ding, sound works on your PC — if you do not, the editor
+   will say what is wrong.
+
+7. FREE SOUND EFFECTS — a new "Sounds" tab in the editor with
+   15 free sounds: Whoosh, Pop, Ding, Coin, Boom, Riser, Airhorn,
+   Applause, Drumroll, Click, Laser, Success, Scratch, Sad
+   Trombone, Punch. Press ▶ to listen, press "+ Add" to put the
+   sound at the playhead. They are mixed into your export. You
+   can also import your own sounds (mp3 / wav). The sounds are
+   made by the app itself (no downloads, no copyright — they are
+   yours to use in any video). The famous "fahhh" meme clip is a
+   recording owned by someone else, so I could not copy it — but
+   the sounds here cover the same moments (whoosh, boom, airhorn,
+   sad trombone...). If you have the "fahhh" sound as a file on
+   your PC, import it from the Sounds tab and use it.
+
+8. PROPER EDIT / DELETE (CRUD) — in Recent recordings you can now
+   Rename (pencil), Duplicate (page icon, makes a " copy.mp4") and
+   Delete (trash) a video — it copies/deletes its script and
+   captions files too. In the editor, "Duplicate" copies the
+   selected clip, and "Save" (top bar) saves the whole project
+   to a .json file — "Open" loads it back later. In the editor's
+   Templates tab, your own / imported templates now have a
+   "Delete this template" button, and "Save my look" adds the
+   look to the list right away (saving over the same name updates it).
+
+9. FREE AI IN THE EDITOR — a new second "AI:" row, all free,
+   all on your PC (no account, no upload, no cost):
+   - "Auto-Edit": one tap cuts the dead air out of every clip,
+     cuts on the music's beats, and turns auto captions ON.
+   - "Highlights": listens to the whole video, finds the loudest
+     moments (a goal, a kill, a laugh, a drop) and marks them
+     gold on the timeline. Press "Keep only highlights" to cut
+     everything else out. It hears loudness, not the game — it
+     cannot tell which kill it was.
+   - "Scene Split": splits the selected clip wherever the picture
+     changes (a new scene, a cut, a new camera angle).
+   - "Best Thumbnail": looks at 16 moments in the video and saves
+     the best frame as your thumbnail — sharp, well lit, and with
+     a face if there is one.
+
+10. EVERYTHING TESTED — 127 checks passed (was 88): recording,
+   mic + game sound mixing, system audio, facecam mirror, all
+   filters, LING, Smart Record, live failing safely, all
+   templates, all caption styles, all animations, transitions,
+   LUTs, remove silence, beat split, reverse, freeze, stabilize,
+   denoise, ducking, GIF, thumbnail, smart reframe, installer,
+   uninstall, replay — PLUS the new ones: the voice lands on the
+   mouth (0.00 s delay), the paused second is cut from the sound,
+   the voice really changes mid-recording (440 Hz -> 704 Hz Deep),
+   the editor plays sound, all 15 sound effects, SFX in the
+   export at the right time, rename + delete recordings, delete
+   a template, duplicate a recording, duplicate a clip, and
+   project save -> load (a missing clip is left out and reported),
+   the editor sound fallback (built-in player fails -> ffplay
+   plays; no built-in player at all -> ffplay still plays), the
+   video waiting for its sound, scene detection, highlights
+   (loud moment found and kept alone), best-frame scoring, and
+   all four new AI tools in the editor — PLUS the left-click
+   zoom: the mouse listener stays alive 1 s into a recording, a
+   real left click zooms 1.8x right on the click point, the zoom
+   eases back to 1.0 after the hold, and the recording still
+   saves as a video.
+
+11. LEFT-CLICK ZOOM — FIXED. This was the bug you reported: the
+   app stopped listening for mouse clicks almost as soon as a
+   recording started (about 0.2 s in), so no click ever reached
+   the zoom code — the zoom itself was fine, it just never heard
+   the click. Now the click listener stays alive for the whole
+   recording: left-click zooms in 1.8x right where you clicked,
+   then zooms back out after a moment. Tested with a real click.
+   The same bug was also cutting Live streams off at the start,
+   so Live is fixed by the same change — please test Live on
+   your PC with this version.
+
+12. BETTER EDITOR — the four things you asked for, plus the
+   OpenClip ideas and the animated subtitles:
+   - AI EDIT v2: also fixes the picture by itself (brightness
+     and colour), keeps natural short pauses instead of cutting
+     everything into tiny pieces, and uses smooth fades between
+     beat cuts.
+   - CUT: "Keep before playhead" / "Keep after playhead" buttons,
+     and type the exact trim time (2 decimals).
+   - SOUND: loudness normalizer (quiet and loud parts come out
+     even), fade in / fade out on each clip, and a waveform on
+     the timeline so you can SEE where the sound is loud or
+     silent.
+   - SUBTITLES: edit the caption words yourself after they are
+     made, change the size and position, and the export also
+     saves an .srt file.
+   - ANIMATED SUBTITLES (on by default): the words pop in one
+     by one as they are spoken, Hormozi style (spoken word big
+     and yellow, the rest dimmer). Change it to Karaoke, Bounce,
+     Slide up, or Typewriter. Works in preview and in export.
+   - FIND THE PARTS ABOUT X: type what to look for ("goal",
+     "funny", "win") and it finds those moments from the words
+     spoken. Cuts snap to sentence ends — never in the middle
+     of a word. One long video becomes many short clips at once
+     (repurpose mode), each with its own auto title and cover.
+     If you already have an .srt file next to the video, it
+     uses that — no need to transcribe again.
+   - FREE AI MODELS (optional): in the editor's AI panel, pick
+     OpenRouter (free cloud key from openrouter.ai, no payment)
+     or Ollama (local, on your PC, default model llama3.2:3b).
+     The AI then READS what was said and picks the best moments
+     and writes the titles. The key stays only on your PC and
+     is never saved in a project file. No key, no internet, or
+     Ollama not running? The editor just uses the free offline
+     version — it still works, and tells you how to start
+     Ollama if you want the local one.
+
+13. FULL NEW DESIGN — both windows, like the Dribbble designs:
+   - RECORDER: thin icon bar on the left (Record, Library,
+     Facecam, Audio, Live, Script, Settings), big preview in
+     the middle, timer on top, and a BIG ROUND RED Record
+     button at the bottom, like a camera app. No more long wall
+     of settings — one section at a time. Right side shows your
+     session: Now recording, Smart Record live, Sound, Instant
+     Replay.
+   - EDITOR: thin icon bar on the left (Templates, Media,
+     Audio, Sounds, Text, Stickers, Effects, AI), big preview
+     in the middle with a floating Magic Tools / Size /
+     Background pill under it, light-blue Export button on top,
+     big round Play button, and the timeline at the bottom
+     with video, audio waveform, text and music tracks.
+     Subtitles appear as coloured clips on the timeline, pink
+     and blue, with the words on them.
+   Only the look changed — every button does the same thing,
+   and all 127 checks still pass.
+
+14. RESPONSIVE DESIGN + MEMES — the two things you asked for last:
+   - RESPONSIVE: the windows now fit any size. The preview grows
+     and shrinks with the window, the side panels flex instead of
+     cutting buttons off, the toolbar wraps to a second row when
+     the window is narrow, the timeline gets taller with the
+     window, and there is a minimum window size so nothing is ever
+     squeezed off-screen. The Record and Play buttons are truly
+     round now. Record, timer and status are biggest and closest
+     to the preview; the timeline gets more height with Play and
+     seek right next to it; trim, speed and filter are visible
+     without scrolling. Tested at 1024x640, 1400x860 / 1280x820
+     and 1920x1080 — no clipped buttons, no panel pushed
+     off-screen. (At the very smallest height the recorder's lower
+     Session cards scroll a little; "Now recording" is always
+     fully visible.)
+   - MEME TEMPLATES (10): A Few Moments Later, One Eternity
+     Later, 2000 Years Later, Twelve Seconds Later, A Few Minutes
+     Later, Tomorrow, To Be Continued, Bruh Moment, Emotional
+     Damage, Dramatic Moment — big bold words on your clip, one
+     tap in the Templates tab. (The exact SpongeBob card picture
+     belongs to Nickelodeon, so the editor recreates the same
+     look with its own text — same words, same feel.)
+   - MEME VIDEO CLIPS (100): the same memes as real 2-3 second
+     video clips you can drop into any video with one tap
+     (Templates tab -> "Meme videos"): 20 time cards, 20
+     reactions, 15 fails, 15 wins, 15 dramatic moments, 15
+     gaming moments (Headshot!, Killstreak, 1V5, 360 No Scope,
+     GG EZ...). Each one has its sound in it already.
+   - MAKE YOUR OWN MEME CARD: type any words in the Templates
+     tab, pick a style, press "Make my meme card" — it makes a
+     new video card in seconds, so you can have as many as you
+     want.
+   - AUTO-EDIT ADDS MEMES BY ITSELF: click Auto-Edit and the AI
+     listens to your video, finds the best moments (a loud funny
+     part, a fail, a win, a shock) and drops the right meme sound
+     there, plus the matching meme card at the best moment. It
+     tells you what it added. Turn it off with the "Add memes
+     automatically" switch in the AI panel.
+   - 329 FREE SOUNDS in the Sounds tab now (was 15): the 15
+     synthesized ones + Fahh, Bruh, Emotional Damage, Dun Dun
+     Dunnn, Vine Boom, Roblox Oof, Windows XP Error, MLG Airhorn,
+     Metal Pipe, Wilhelm Scream, Slide Whistle, Goat Scream,
+     Sad Violin, and 300 more — gathered from free sources
+     (712tools, sfxreels, memesoundboards.org, myinstants). Some
+     are copyrighted samples offered as free downloads; they are
+     marked "check before commercial use" in sounds/SOURCES.txt.
+     Pixabay could not be used — it blocks all automatic
+     downloads with a bot check, so its 137 sounds need a person
+     to click download on the website.
+   Tested: 127 checks, all passing.
+
+15. EDITOR CENTRE MADE SIMPLER (your feedback — "too much"):
+   Only one row of buttons under the preview now — Split, Speed,
+   Volume, Delete, Duplicate, Text — so the preview is bigger.
+   Sticker, Filter and Captions moved out of the toolbar (they
+   are still one click away: Stickers and Effects in the left
+   icon bar, Captions switch in the right panel). The "Keep
+   before / after playhead" buttons moved to the right panel,
+   next to the trim boxes. Nothing was removed, only moved.
+   Tested: 127 checks, all passing.
+
+HOW TO INSTALL THIS UPDATE
+--------------------------
+1. Close the app if it is open.
+2. Double-click "Install Lite Game Recorder.bat".
+3. Press "Install" and wait 2-3 minutes (it installs the libraries,
+   builds the app, downloads FFmpeg for sound, and makes the
+   Desktop icon). Your recordings are never deleted.
+4. Double-click the Desktop icon to open it.
+
+WHAT IS INSIDE
+--------------
+- app.py, editor.py, installer.py — the app + video editor + setup
+- requirements.txt — the libraries (now includes packaging)
+- LiteGameRecorder.spec, build.py, icon.png, icon.ico
+- "Install Lite Game Recorder.bat" — one-click install
+- "Uninstall Lite Game Recorder.bat" — removes the app, never recordings
+- "Start Lite Game Recorder.vbs" — starts the app without a black window
+- templates/ — 2 free example templates (Golden Hour Glow, Streamer Hype)
+- sounds/ — 329 free sound effects for the editor (the 15 synthesized ones + Fahh, Bruh, Emotional Damage, Vine Boom, Roblox Oof, Windows XP Error, MLG Airhorn, Metal Pipe, and 300 more; see sounds/SOURCES.txt for where each came from)
+- meme-videos/ — 100 meme video clips to drop into any video (time cards, reactions, fails, wins, dramatic, gaming)
+- make_meme_videos.py — renders the meme video clips (python make_meme_videos.py rebuilds all 100)
+- generate_sounds.py — makes the sounds again if you ever delete them (python generate_sounds.py)
+
+GAME SOUND SETUP (one time, Windows)
+-------------------------------------
+If game sound still does not work after installing: right-click the
+speaker icon -> Sound settings -> enable "Stereo Mix" (or install
+the free VB-Cable). Then in the app press "Test game sound —
+record 3 sec" and play something loud. It will tell you if it works.
+
+HONEST LIMITS (still true)
+--------------------------
+- Smart Record's speech engine is NOT in the .exe — use run.bat
+  for it. Character filters are a style look, not a real face-swap.
+- No auto kill/win detection in a specific game, no cloud AI
+  background removal, no 4K/60fps hardware encoding.

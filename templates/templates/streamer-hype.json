@@ -1,0 +1,17 @@
+{
+  "name": "Streamer Hype",
+  "desc": "Neon shake with punchy yellow captions — for gaming clips",
+  "ratio": "9:16  Vertical (TikTok / Reels)",
+  "transition": "Glitch",
+  "speed": 1.0,
+  "filter": "Neon",
+  "text_color": "Yellow",
+  "text_anim": "Shake",
+  "clip_anim": "Shake",
+  "captions": true,
+  "caption_style": "Word Punch",
+  "ramp": "None",
+  "letterbox": false,
+  "grain": false,
+  "border": false
+}

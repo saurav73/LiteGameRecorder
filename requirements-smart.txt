@@ -1,0 +1,8 @@
+# Optional - only for Smart Record (speech check). Install with:
+#   pip install -r requirements-smart.txt
+# faster-whisper runs offline on your CPU, tiny.en model (~75 MB, downloaded
+# once on first use). If you skip this, the app tries Google Web Speech
+# (online, needs SpeechRecognition) and otherwise skips the check gracefully.
+faster-whisper>=1.0
+av==12.3.0
+SpeechRecognition>=3.10

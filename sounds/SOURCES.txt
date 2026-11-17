@@ -1,0 +1,402 @@
+Meme sounds in this folder — where they came from
+================================================
+
+The 15 original sounds (whoosh, pop, ding, coin, boom, riser, airhorn,
+applause, drumroll, click, laser, success, scratch, sad-trombone, punch)
+were synthesized with numpy by generate_sounds.py — free to use, no licence.
+
+The 10 meme sounds below were downloaded 2026-11-15 from sfxreels.com
+(https://sfxreels.com/meme-sound-effects/). They are royalty-free
+RE-CREATIONS made by sfxreels — not the original viral recordings — so
+they are cleared for commercial use and will not trigger music detection
+on Reels/TikTok. Converted here from MP3 to 44.1 kHz mono 16-bit WAV to
+match the rest of the library.
+
+- a-few-moments-later.wav — "A Few Moments Later" time-card sting
+- bone-crack.wav — sharp crack for cringe gags
+- bruh.wav — deadpan "Bruh" reaction (source file: bruh-speech.mp3)
+- emotional-damage.wav — "Emotional Damage!" roast punchline
+- fahh.wav — "Fahh" vocal stinger (the viral meme sound, as a legal re-creation)
+- fbi-open-up.wav — "FBI Open Up!" (source file: fbi-open-up-speech.mp3)
+- oh-no-laughing.wav — "Oh No No No" laugh (source file: oh-no-no-no-no-laughing.mp3)
+- technologia.wav — "Technologia" music sting
+- what.wav — confused "What?" reaction
+- wow-anime.wav — anime "Wow!" (source file: wow-anime-meme-sound.mp3)
+
+The real original "Fahh" / "Bruh" / "Emotional Damage" vocal clips are
+copyrighted samples and cannot be bundled as the originals — these
+re-creations are the legal way to get the same moments.
+
+- dun-dun-dunnn.wav — "Dun Dun Dunnn" dramatic sting (three descending notes),
+  synthesized with numpy on 2026-11-15 to complete the Auto-Edit mapping and
+  the Dramatic Moment meme template pairing. Free to use, no licence.
+
+================================================================
+Second big batch — added 2026-11-15 (249 new sounds, 275 total)
+================================================================
+
+A) 712tools.com — 106 sounds (Vine Boom, Windows XP error,
+   Roblox Oof, MLG Airhorn, Dun Dun Dun, and 101 more)
+   Source: https://712tools.com/viral-sound-effects/
+   Licence: the site synthesizes every sound live in the browser
+   from oscillators + noise — 'no sampled recordings, so no
+   licensing, attribution, or royalty is required'. These WAVs
+   were rendered offline by re-implementing the site's own
+   published Web Audio synth definitions with numpy (same
+   oscillator sweeps, gain envelopes and filtered noise), so
+   they are synthesized sounds, royalty-free, no samples.
+   Skipped from the 111: bruh, emotional-damage, applause,
+   click, sad-trombone (already in this library under those names).
+   - achievement.wav (1.00 s) — Achievement Unlocked
+   - alarm-clock.wav (2.00 s) — Alarm Clock
+   - aughhh.wav (1.10 s) — Aughhh
+   - aww.wav (1.10 s) — Aww (Cute)
+   - beep-medical.wav (2.50 s) — Heart Monitor Beep
+   - beep-morse.wav (2.20 s) — Morse Beeps
+   - bell-chime.wav (2.50 s) — Bell Chime
+   - boi.wav (0.25 s) — Boi
+   - boing.wav (0.60 s) — Boing
+   - bonk.wav (0.30 s) — Bonk
+   - boo-scary.wav (0.55 s) — Boo (Scary)
+   - buzzer-wrong.wav (0.80 s) — Wrong Answer Buzzer
+   - camera-flash.wav (0.40 s) — Camera Flash
+   - camera-shutter.wav (0.25 s) — Camera Shutter
+   - car-horn.wav (0.50 s) — Car Horn
+   - cash-register.wav (1.20 s) — Cash Register (Cha-Ching)
+   - checkpoint.wav (0.70 s) — Checkpoint
+   - cinematic-hit.wav (1.60 s) — Cinematic Boom Hit
+   - cinematic-whoosh.wav (1.60 s) — Cinematic Whoosh
+   - coin-pickup.wav (0.35 s) — Coin Pickup
+   - cough.wav (0.35 s) — Cough
+   - count-up.wav (1.00 s) — Count Up
+   - cricket.wav (2.00 s) — Awkward Cricket
+   - crowd-boo.wav (1.80 s) — Crowd Boo
+   - discord-ping.wav (0.50 s) — Discord-style Ping
+   - door-knock.wav (0.90 s) — Door Knock
+   - downlifter.wav (1.00 s) — Downlifter
+   - dun-dun-dun.wav (2.20 s) — Dun Dun Dunnn
+   - email-notify.wav (0.55 s) — Email Notification
+   - epic-choir.wav (2.50 s) — Epic Choir Aah
+   - epic-hit.wav (1.80 s) — Epic Impact
+   - error-buzz.wav (0.40 s) — Error Buzz
+   - explosion.wav (1.50 s) — Explosion
+   - extra-life.wav (0.70 s) — Extra Life
+   - fire-alarm.wav (2.00 s) — Fire Alarm
+   - fire-crackle.wav (3.00 s) — Fire Crackle
+   - flatline.wav (2.50 s) — Flatline
+   - footsteps.wav (2.00 s) — Footsteps
+   - game-over.wav (1.20 s) — Game Over
+   - gasp.wav (0.45 s) — Gasp
+   - glitch.wav (0.60 s) — Glitch
+   - goofy-honk.wav (0.35 s) — Clown Honk
+   - heartbeat.wav (2.20 s) — Heartbeat
+   - hesitation.wav (0.70 s) — Hmm (Thinking)
+   - hit-8bit.wav (0.20 s) — Hit (8-bit)
+   - jump-8bit.wav (0.20 s) — Jump (8-bit)
+   - kazoo.wav (0.60 s) — Kazoo Toot
+   - keyboard-type.wav (1.30 s) — Keyboard Typing
+   - laser-zap.wav (0.50 s) — Laser Zap
+   - laugh-track.wav (1.80 s) — Laugh Track
+   - level-up.wav (0.70 s) — Level Up
+   - menu-close.wav (0.30 s) — Menu Close
+   - menu-open.wav (0.30 s) — Menu Open
+   - message-pop.wav (0.25 s) — Message Pop
+   - mlg-airhorn.wav (1.00 s) — MLG Airhorn
+   - money-count.wav (1.00 s) — Money Count
+   - notification-ding.wav (0.60 s) — Notification Ding
+   - orchestra-hit.wav (0.70 s) — Orchestra Hit
+   - phone-ring.wav (2.00 s) — Phone Ring
+   - portal-warp.wav (1.20 s) — Portal Warp
+   - power-down.wav (0.80 s) — Power Down
+   - power-up.wav (0.60 s) — Power Up
+   - quack.wav (0.35 s) — Quack
+   - rain.wav (3.00 s) — Rain (Light)
+   - record-scratch.wav (0.50 s) — Record Scratch
+   - reverse-whoosh.wav (0.70 s) — Reverse Whoosh
+   - reward.wav (1.30 s) — Reward Reveal
+   - rimshot.wav (1.00 s) — Rimshot (Ba-Dum-Tss)
+   - rise-riser.wav (2.50 s) — Riser (Tension Build)
+   - riser-quick.wav (0.70 s) — Quick Riser
+   - roblox-oof.wav (0.35 s) — Oof (Roblox-style)
+   - select-menu.wav (0.15 s) — Menu Select
+   - shoot-blaster.wav (0.35 s) — Blaster Shoot
+   - sigh.wav (1.00 s) — Sigh
+   - siren.wav (2.50 s) — Police Siren
+   - slide-whistle-down.wav (0.90 s) — Slide Whistle Down
+   - slide-whistle-up.wav (0.90 s) — Slide Whistle Up
+   - sneeze.wav (0.50 s) — Sneeze
+   - sparkle-magic.wav (1.00 s) — Sparkle / Magic
+   - spongebob-transition.wav (1.00 s) — Transition (Cartoon)
+   - submarine-ping.wav (1.50 s) — Submarine Ping
+   - success-chime.wav (0.55 s) — Success Chime
+   - surprise.wav (0.50 s) — Sudden Surprise
+   - sus.wav (0.60 s) — Sus (Suspicion)
+   - swipe.wav (0.35 s) — Swipe
+   - swipe-transition.wav (0.40 s) — Swipe Transition
+   - swoosh.wav (0.60 s) — Swoosh
+   - tada.wav (1.30 s) — Ta-Da!
+   - tap.wav (0.12 s) — Soft Tap
+   - text-message.wav (0.40 s) — Text Message Tone
+   - thunder.wav (2.50 s) — Thunder Clap
+   - ticking-clock.wav (3.00 s) — Ticking Clock
+   - toggle-off.wav (0.15 s) — Toggle Off
+   - toggle-on.wav (0.15 s) — Toggle On
+   - vine-boom.wav (1.40 s) — Vine Boom
+   - warning-beep.wav (1.50 s) — Warning Beep
+   - water-drop.wav (0.40 s) — Water Drop
+   - whistle-catcall.wav (1.00 s) — Wolf Whistle
+   - why-are-you-running.wav (0.90 s) — Chase Alert
+   - wind.wav (3.00 s) — Wind Gust
+   - windows-xp-error.wav (0.60 s) — Windows Error
+   - wow.wav (0.70 s) — Wow
+   - yay.wav (0.60 s) — Yay!
+   - yeet.wav (0.50 s) — Yeet
+   - zoom-in.wav (0.60 s) — Zoom In
+   - zoom-out.wav (0.60 s) — Zoom Out
+
+B) sfxreels.com — 33 more sounds (beyond the 10 meme sounds above)
+   Source pages: https://sfxreels.com/comedic-sound-effects/,
+   /impact-sound-effects/, /notification-sound-effects/,
+   /best-sound-effects-for-viral-reels/ and the individual
+   sound pages under /sounds/. Royalty-free RE-CREATIONS made
+   by sfxreels — not original recordings — cleared for
+   commercial use. Converted from MP3 to WAV here.
+   Skipped: pop, riser, vine-boom, glitch, notification-ding,
+   camera-capture-shutter (already in this library), and
+   angels-choir (17.5 s — too long for a punchline sound).
+   - alien-mystery-sting.wav (1.63 s)
+   - alien-mystery-theme.wav (14.87 s)
+   - bell-prank.wav (1.17 s)
+   - boxing-bell.wav (2.59 s)
+   - cash-register-cha-ching.wav (1.09 s)
+   - censor-beep.wav (0.94 s)
+   - clock-ticking.wav (5.87 s)
+   - core-bass-hit.wav (0.70 s)
+   - crickets-awkward-silence.wav (2.47 s)
+   - dj-scratch.wav (0.92 s)
+   - doubt-music.wav (1.75 s)
+   - epic-fail-flute.wav (8.72 s)
+   - fart.wav (0.31 s)
+   - final-credit-music.wav (6.60 s)
+   - magic-wand.wav (1.59 s)
+   - metallic-riser.wav (1.71 s)
+   - mission-complete.wav (9.36 s)
+   - paper-flip.wav (1.12 s)
+   - pc-shutdown-chime.wav (1.83 s)
+   - retro-game-over.wav (6.85 s)
+   - retro-hero-horns.wav (12.40 s)
+   - romance-music-meme.wav (5.81 s)
+   - run-music.wav (3.97 s)
+   - sad-violin.wav (4.55 s)
+   - slap.wav (0.78 s)
+   - squeak.wav (0.70 s)
+   - suspense.wav (1.35 s)
+   - tape-rewind.wav (6.10 s)
+   - west-coast-groove.wav (4.81 s)
+   - whoosh-cinematic.wav (5.37 s)
+   - whoosh-snap.wav (0.79 s)
+   - whoosh-transition.wav (1.69 s)
+   - zoom.wav (1.69 s)
+
+C) memesoundboards.org — 110 sounds (Roblox oof, Italian
+   brainrot, Wilhelm scream, slide whistle, goat scream,
+   classic fart, face slap, cartoon boing, 8-bit sounds...)
+   Source: https://www.memesoundboards.org/meme-sound-effects/
+   (direct CDN MP3s, free download, no account).
+   LICENCE WARNING — READ THIS: the site says these are free
+   to play and download for personal and most creator content,
+   BUT many of them began life as clips from songs, movies, TV
+   shows or games, so the underlying audio can still carry
+   someone else's rights. These are COPYRIGHTED SAMPLES offered
+   as free downloads — fine for personal/fun edits, but check
+   before using one in monetized or commercial work.
+   - 8-bit-blip.wav (0.42 s)
+   - 8-bit-bonus.wav (0.37 s)
+   - 8-bit-explosion.wav (0.44 s)
+   - 8-bit-hurt.wav (0.32 s)
+   - acoustic-guitar-strum.wav (0.59 s)
+   - adopt-me-cash.wav (1.90 s)
+   - air-horn.wav (1.61 s)
+   - anatoxic-garamararamararaman.wav (1.96 s)
+   - arcade-button.wav (0.36 s)
+   - arrow-whoosh.wav (0.39 s)
+   - arsenal-headshot.wav (1.53 s)
+   - arsenal-kill.wav (1.03 s)
+   - atm-beep.wav (0.14 s)
+   - balloon-pop.wav (0.35 s)
+   - baseball-catch.wav (0.26 s)
+   - bass-guitar.wav (0.40 s)
+   - blox-fruits-level-up.wav (8.10 s)
+   - body-fall-thud.wav (0.39 s)
+   - boing-spring.wav (0.95 s)
+   - bongo-drum.wav (0.28 s)
+   - brainrot-cat.wav (5.11 s)
+   - brookhaven-doorbell.wav (9.51 s)
+   - capuccino-assasino-italian-brainrot.wav (4.17 s)
+   - car-alarm.wav (0.41 s)
+   - car-crash.wav (0.54 s)
+   - cartoon-boing.wav (0.74 s)
+   - cartoon-slap.wav (1.30 s)
+   - classic-fart.wav (0.65 s)
+   - conga-drum.wav (0.65 s)
+   - cowbell.wav (0.35 s)
+   - crow-caw.wav (0.39 s)
+   - crowd-chant.wav (0.43 s)
+   - digital-glitch.wav (0.38 s)
+   - discord-notification.wav (1.10 s)
+   - distant-scream.wav (4.15 s)
+   - dramatic-sting.wav (1.20 s)
+   - duck-quack.wav (0.60 s)
+   - electric-zap.wav (0.22 s)
+   - erm-what-the-sigma-full.wav (8.00 s)
+   - error-tone.wav (0.42 s)
+   - face-slap.wav (0.47 s)
+   - fake-laugh.wav (0.44 s)
+   - fox-scream.wav (0.60 s)
+   - frog-croak.wav (0.44 s)
+   - glitch-transition.wav (0.48 s)
+   - goat-scream.wav (0.70 s)
+   - goose-honk.wav (0.45 s)
+   - hand-slap.wav (5.46 s)
+   - hiccup.wav (0.22 s)
+   - jailbreak-siren.wav (9.48 s)
+   - jump-landing.wav (0.46 s)
+   - jumpscare-scream.wav (2.31 s)
+   - keypad-beep.wav (0.31 s)
+   - kick-drum.wav (0.31 s)
+   - laser-blast.wav (0.45 s)
+   - light-switch.wav (0.13 s)
+   - loud-fart.wav (1.39 s)
+   - man-scream.wav (1.56 s)
+   - mateooo-italian-brainrot.wav (5.41 s)
+   - metal-pipe.wav (12.02 s)
+   - murder-mystery-gun.wav (2.13 s)
+   - negative-beep.wav (0.57 s)
+   - nervous-giggle.wav (0.58 s)
+   - new-notification.wav (0.50 s)
+   - ouch.wav (0.61 s)
+   - penguin.wav (0.23 s)
+   - piggy-chase-music.wav (5.85 s)
+   - piggy-jumpscare.wav (3.10 s)
+   - ping-pong.wav (0.17 s)
+   - quick-fart.wav (1.88 s)
+   - retro-laser.wav (0.36 s)
+   - roblox-cash-register.wav (1.67 s)
+   - roblox-death-sound-oof.wav (7.11 s)
+   - roblox-drinking-potion.wav (2.27 s)
+   - roblox-error.wav (2.04 s)
+   - roblox-game-over.wav (1.39 s)
+   - roblox-hurt.wav (2.12 s)
+   - roblox-jumping.wav (2.00 s)
+   - roblox-level-up.wav (1.57 s)
+   - roblox-sword-swing.wav (4.73 s)
+   - roblox-victory-fanfare.wav (3.91 s)
+   - roblox-walking.wav (4.93 s)
+   - rubber-chicken.wav (0.45 s)
+   - scared-scream.wav (0.84 s)
+   - scream.wav (1.56 s)
+   - screaming-goat.wav (0.70 s)
+   - short-fart.wav (1.88 s)
+   - siren-whistle.wav (0.52 s)
+   - slide-whistle.wav (0.89 s)
+   - slot-lever.wav (0.58 s)
+   - slow-clap.wav (0.63 s)
+   - slurp.wav (0.51 s)
+   - slurp-noodles.wav (0.51 s)
+   - snare-drum.wav (0.35 s)
+   - snoring.wav (0.65 s)
+   - snort-laugh.wav (0.33 s)
+   - startup-chime.wav (0.54 s)
+   - steal-a-brainrot-dragon-cannelloni.wav (7.33 s)
+   - steam-train-chuff.wav (0.57 s)
+   - stopwatch-beep.wav (0.40 s)
+   - toggle-switch.wav (0.22 s)
+   - toilet-ananas-nasdas.wav (8.66 s)
+   - tralalero-tralala-meme.wav (1.60 s)
+   - trullimero-trullicina.wav (8.06 s)
+   - typewriter.wav (0.61 s)
+   - vibraslap.wav (1.28 s)
+   - vine-boom-spam.wav (9.60 s)
+   - wet-fart.wav (1.02 s)
+   - wilhelm-scream.wav (0.94 s)
+   - woman-scream.wav (1.04 s)
+
+D) myinstants.com — 59 sounds (Vine Boom variants, Emotional
+   Damage, Metal Pipe Falling, Price Is Right losing horn,
+   Chicken Jockey, Skibidi, Among Us kill, Windows XP fail...)
+   Source: https://www.myinstants.com/ (search pages; direct MP3s
+   served from www.myinstants.com/media/sounds/*.mp3 — the
+   media.myinstants.com host gives empty replies from this
+   machine, the www host works). Converted MP3 -> WAV here.
+   LICENCE WARNING — READ THIS: these are user-uploaded clips,
+   mostly taken from movies, TV shows, games and viral videos.
+   They are COPYRIGHTED SAMPLES offered as free downloads —
+   fine for personal/fun edits, but check before using one in
+   monetized or commercial work. (The site's own library is
+   1000+ sounds; these 59 are the famous short ones, chosen
+   from 1,076 downloaded search results.)
+   - among-us-kill.wav (1.15 s) — myinstants.com
+   - autodarts-bonus-cricket.wav (0.65 s) — myinstants.com
+   - bo-womp.wav (1.18 s) — myinstants.com
+   - bonk-meme.wav (0.43 s) — myinstants.com
+   - boo-womp-spongebob.wav (0.58 s) — myinstants.com
+   - bruh-meme-sound-effect.wav (0.82 s) — myinstants.com
+   - cartoon-metallic-stomp.wav (0.76 s) — myinstants.com
+   - cartoony-bash.wav (0.52 s) — myinstants.com
+   - chicken-jockey-a-minecraft-movie-clean-audio.wav (1.36 s) — myinstants.com
+   - clown-horn-short.wav (0.60 s) — myinstants.com
+   - cricket-bat-hitting-sound.wav (0.20 s) — myinstants.com
+   - discord-message-notification.wav (0.48 s) — myinstants.com
+   - discordmute.wav (0.42 s) — myinstants.com
+   - dry-fart.wav (0.31 s) — myinstants.com
+   - e2-error.wav (0.20 s) — myinstants.com
+   - emotional-damage-meme.wav (3.32 s) — myinstants.com
+   - erichorn.wav (0.65 s) — myinstants.com
+   - gary-meow.wav (0.50 s) — myinstants.com
+   - goofy-yeha-yeehaa-yeeha-yehaa-ohio-sigma-skibidi.wav (2.82 s) — myinstants.com
+   - gruneme-shrek.wav (0.79 s) — myinstants.com
+   - hollow-metallic-head-konk-and-horn.wav (0.37 s) — myinstants.com
+   - huh-cat-meme.wav (0.30 s) — myinstants.com
+   - huh-roblox.wav (0.37 s) — myinstants.com
+   - im-outta-here-sonic-cd.wav (0.74 s) — myinstants.com
+   - jixaw-metal-pipe-falling-sound.wav (3.17 s) — myinstants.com
+   - jump.wav (0.57 s) — myinstants.com
+   - lemmings-bonk.wav (0.23 s) — myinstants.com
+   - loud-dramatic-stinger.wav (8.36 s) — myinstants.com
+   - mario-big-jump-sound-effect.wav (0.62 s) — myinstants.com
+   - mario-meow.wav (0.26 s) — myinstants.com
+   - meme-violin-sad-violin.wav (4.55 s) — myinstants.com
+   - meowl-steal-a-brainrot.wav (0.62 s) — myinstants.com
+   - metal-pipe-vine-boom.wav (2.64 s) — myinstants.com
+   - minecraft-oof-no-delay.wav (0.38 s) — myinstants.com
+   - mlg-air-horn-sound.wav (4.11 s) — myinstants.com
+   - nintendo-switch-error.wav (0.29 s) — myinstants.com
+   - noob-oof-sound.wav (0.42 s) — myinstants.com
+   - oh-my-god-bro-ah-hell-nah.wav (6.66 s) — myinstants.com
+   - perfect-fart.wav (0.34 s) — myinstants.com
+   - price-is-right-losing-trombone.wav (5.98 s) — myinstants.com
+   - proper-clown-short-horn.wav (0.53 s) — myinstants.com
+   - psst-roblox-doors.wav (0.28 s) — myinstants.com
+   - rewind-fail-fx.wav (0.78 s) — myinstants.com
+   - rizzbot-laugh.wav (2.36 s) — myinstants.com
+   - shrek-do-the-roar.wav (0.54 s) — myinstants.com
+   - shrek-roar.wav (9.90 s) — myinstants.com
+   - skibidi-toilet-steal-a-brainrot.wav (1.52 s) — myinstants.com
+   - slap-quandale-dingle.wav (0.46 s) — myinstants.com
+   - sonic-cd-jump.wav (0.53 s) — myinstants.com
+   - spongebob-fail.wav (3.38 s) — myinstants.com
+   - sudden-suspense-boom.wav (3.04 s) — myinstants.com
+   - sus-violin.wav (2.88 s) — myinstants.com
+   - trollface-smile.wav (5.29 s) — myinstants.com
+   - vine-boom-bass-boosted-man.wav (1.11 s) — myinstants.com
+   - vine-boom-meme.wav (1.25 s) — myinstants.com
+   - windows-vista-chord-sound-effect.wav (0.71 s) — myinstants.com
+   - windows-xp-critical-error-full-version.wav (0.90 s) — myinstants.com
+   - windows-xp-fail.wav (0.99 s) — myinstants.com
+   - zelda-navi-hello.wav (0.44 s) — myinstants.com
+
+NOTE — duplicates removed 2026-11-15 after a full content check
+(MD5 of the decoded audio): dry-fart (= fart), screaming-goat
+(= goat-scream), man-scream (= scream), meme-violin-sad-violin
+(= sad-violin), slurp-noodles (= slurp). The kept copy is listed
+above under its own name; the removed copy had identical audio.
