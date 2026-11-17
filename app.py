@@ -3878,18 +3878,24 @@ class App(ctk.CTk):
             messagebox.showerror("Delete recording", str(e))
 
     def _open_editor(self, path=None):
-        """Open the CapCut-style video editor, optionally with one
-        recording already loaded. Recordings are never touched by
-        the editor - Export saves a new *_edited.mp4 next to it."""
+        """Open the CapCut-style video editor in its OWN process,
+        optionally with one recording already loaded. A separate
+        process means closing the recorder never closes the editor
+        (and vice versa). Recordings are never touched by the
+        editor - Export saves a new *_edited.mp4 next to it."""
         try:
-            from editor import VideoEditor
-        except Exception as exc:
-            messagebox.showerror("Video Editor",
-                                 "Could not open the editor: %s" % exc)
-            return
-        try:
-            VideoEditor(self, initial_path=path,
-                        on_exported=self._refresh_recent)
+            if getattr(sys, "frozen", False):
+                # PyInstaller build: re-run this exe with --editor,
+                # since editor.py does not exist as a file there.
+                cmd = [sys.executable, "--editor"]
+            else:
+                editor_py = Path(__file__).resolve().parent / "editor.py"
+                cmd = [sys.executable, str(editor_py)]
+            if path:
+                cmd.append(str(path))
+            subprocess.Popen(
+                cmd, cwd=str(Path(__file__).resolve().parent),
+                **_quiet_subprocess_kwargs())
         except Exception as exc:
             messagebox.showerror("Video Editor",
                                  "Could not open the editor: %s" % exc)
@@ -4561,4 +4567,12 @@ if __name__ == "__main__":
             "Or double-click run.sh (Mac/Linux) / run.bat (Windows), which does it for you.",
         )
         sys.exit(1)
-    App().mainloop()
+    if "--editor" in sys.argv:
+        # Standalone editor (frozen exe re-run by _open_editor, so the
+        # editor lives in its own process and outlives the recorder).
+        _idx = sys.argv.index("--editor")
+        _path = sys.argv[_idx + 1] if _idx + 1 < len(sys.argv) else None
+        from editor import _run_standalone
+        _run_standalone(_path)
+    else:
+        App().mainloop()

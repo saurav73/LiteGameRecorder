@@ -8,6 +8,12 @@ git tag (vX.Y.Z) and a Windows release built from that tag.
 
 ## Unreleased
 
+- Fixed: the video editor now runs in its own process. Opening the
+  editor from the recorder and then closing the recorder used to
+  kill both tools, because the editor was a child window of the
+  recorder. Now the editor is launched separately (a new process,
+  or a re-run of the exe with --editor in the Windows build), so
+  either tool can be closed without affecting the other.
 - Real meme content: the 100 meme video clips are now real footage
   from free stock videos on Coverr (no AI-generated video, no
   copyrighted viral clip), cut to 2.5 s with the same filenames and

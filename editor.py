@@ -7151,3 +7151,38 @@ class VideoEditor(ctk.CTkToplevel):
                     pass
         else:
             messagebox.showerror("Export failed", msg)
+
+
+def _run_standalone(initial_path=None):
+    """Run the editor as its own process (own window, own mainloop).
+
+    Used when the recorder launches the editor separately, so closing
+    the recorder never closes the editor (and vice versa). The hidden
+    CTk root exists only to own the mainloop; the editor window is
+    what the user sees. When the editor closes, the hidden root is
+    destroyed too so the process exits cleanly.
+    """
+    root = ctk.CTk()
+    root.withdraw()
+    ed = VideoEditor(root, initial_path=initial_path)
+
+    def _quit_when_editor_closes():
+        try:
+            alive = bool(ed.winfo_exists())
+        except Exception:
+            alive = False
+        if not alive:
+            try:
+                root.destroy()
+            except Exception:
+                pass
+        else:
+            root.after(500, _quit_when_editor_closes)
+
+    root.after(500, _quit_when_editor_closes)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    _path = sys.argv[1] if len(sys.argv) > 1 else None
+    _run_standalone(_path)
