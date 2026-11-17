@@ -96,7 +96,9 @@ jobs:
       - name: Download FFmpeg (macOS)
         if: runner.os == 'macOS'
         run: |
-          curl -L -o ffmpeg.zip "https://evermeet.cx/ffmpeg/getrelease/zip"
+          # evermeet.cx retired the /getrelease/zip endpoint (410 Gone),
+          # so pin the direct release zip instead.
+          curl -L -o ffmpeg.zip "https://evermeet.cx/ffmpeg/ffmpeg-9.0.2.zip"
           unzip -o ffmpeg.zip -d ffmpeg-dl
           cp ffmpeg-dl/ffmpeg dist/ffmpeg
           chmod +x dist/ffmpeg
