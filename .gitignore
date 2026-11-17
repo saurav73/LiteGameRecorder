@@ -21,6 +21,7 @@ openrouter_key.txt
 
 # Recordings and generated outputs (the project's own meme-videos/
 # and sounds/ folders are tracked and stay in the repo)
+meme-sources/
 Game_*.mp4
 Game_*.gif
 *.mic.wav
