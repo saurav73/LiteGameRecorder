@@ -3056,6 +3056,7 @@ class VideoEditor(ctk.CTkToplevel):
         self._sel = None
         self._preview_photo = None
         self._exporting = False
+        self._captions_generating = False  # v2.4: Generate captions running
         self._thumbs = {}       # path -> PIL image (96x54)
         self._thumb_tk = {}     # path -> PhotoImage (timeline canvas)
         self._playhead_id = None
@@ -3542,6 +3543,11 @@ class VideoEditor(ctk.CTkToplevel):
                       fg_color=CC_SKY, hover_color=CC_SKY_HOVER,
                       text_color="#0F1218", font=("Segoe UI", 12, "bold"),
                       command=self._create_subtitles).pack(fill="x", padx=12, pady=(6, 2))
+        # v2.4: one tap writes a real .srt file next to each source
+        # video (for YouTube / any player) and turns burn-in on.
+        ctk.CTkButton(b, text="📝  Generate captions (.srt)",
+                      fg_color=CC_CARD, hover_color=CC_BORDER,
+                      command=self._generate_captions).pack(fill="x", padx=12, pady=(6, 2))
         ctk.CTkButton(b, text="✏️  Edit captions (fix the words)",
                       fg_color=CC_CARD, hover_color=CC_BORDER,
                       command=self._edit_captions).pack(fill="x", padx=12, pady=(6, 2))
@@ -3893,6 +3899,81 @@ class VideoEditor(ctk.CTkToplevel):
             "Creating subtitles from the speech in your video… they appear on the preview and on export.")
         if self._auto_highlight_var.get():
             self._find_highlights("")
+
+    def _generate_captions(self):
+        """Generate captions (.srt) for every clip: listen with the
+        offline speech engine (the same one Smart Record uses),
+        write an .srt next to each source video, and turn Auto
+        captions on so the export burns them in too. Runs in the
+        background; a missing speech engine shows a clear message
+        instead of crashing."""
+        if not self.project["clips"]:
+            messagebox.showinfo("Generate captions", "Add a video clip first.")
+            return
+        if self._captions_generating:
+            self._status_var.set("Captions are already being generated…")
+            return
+        self._captions_generating = True
+        self._status_var.set("Generating captions… listening to the speech in your video (first time may download the speech model, ~75 MB, once)")
+        threading.Thread(target=self._generate_captions_thread, daemon=True).start()
+
+    def _generate_captions_thread(self):
+        lang = self.project.get("caption_lang", "en")
+        written, errors = [], []
+        edits = dict(self.project.get("caption_edits") or {})
+        for ci, c in enumerate(self.project["clips"]):
+            # A .srt next to the video wins over listening again.
+            segs, err = srt_segments_for_clip(c["path"], c["start"], c["end"])
+            if not segs:
+                segs, err = make_captions(c["path"], c["start"], c["end"],
+                                          language=lang)
+            if err:
+                errors.append("clip %d: %s" % (ci + 1, err))
+                continue
+            if not segs:
+                errors.append("clip %d: no speech found" % (ci + 1))
+                continue
+            # Burn-in uses clip-local times; the .srt next to the
+            # source video uses file times (trim start + local).
+            edits[str(ci)] = [dict(s) for s in segs]
+            start = float(c.get("start", 0.0))
+            file_segs = [{"start": start + float(s["start"]),
+                          "end": start + float(s["end"]),
+                          "text": s.get("text", "")} for s in segs]
+            try:
+                srt_path = Path(c["path"]).with_suffix(".srt")
+                srt_path.write_text(segments_to_srt(file_segs), encoding="utf-8")
+                written.append(srt_path.name)
+            except Exception as exc:
+                errors.append("clip %d: could not write .srt (%s)" % (ci + 1, exc))
+
+        def _done():
+            self._captions_generating = False
+            if written:
+                self.project["caption_edits"] = edits
+                self._caption_cache = {}
+                self._captions_var.set(True)
+                self._read_project_settings()
+                self._snapshot()
+                self._preview_key = None
+                self._refresh_all()
+            if written and not errors:
+                self._status_var.set("Captions saved: %s — Auto captions is ON, so the export burns them in." % ", ".join(written))
+                messagebox.showinfo("Captions generated",
+                                    "Saved:\n" + "\n".join("  " + w for w in written) +
+                                    "\n\nAuto captions is ON, so the export burns them into the video too.")
+            elif written:
+                self._status_var.set("Captions saved for %d clip(s): %s. %s" % (len(written), ", ".join(written), "; ".join(errors)))
+                messagebox.showinfo("Captions generated",
+                                    "Saved:\n" + "\n".join("  " + w for w in written) +
+                                    "\n\nSome clips had no captions:\n" + "\n".join("  " + e for e in errors))
+            else:
+                self._status_var.set("Could not generate captions: %s" % ("; ".join(errors) or "unknown error"))
+                messagebox.showwarning("Could not generate captions",
+                                       "No captions were made.\n\n" + "\n".join(errors) +
+                                       "\n\nInstall the speech engine with: pip install -r requirements-smart.txt")
+
+        self.after(0, _done)
 
     def _on_space(self, _event=None):
         # Space plays/pauses — unless you are typing in a text box.
