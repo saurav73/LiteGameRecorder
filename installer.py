@@ -28,8 +28,8 @@ import threading
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
 
-VERSION = "2.3"
-APP_NAME = "Lite Game Recorder"
+from app_version import __version__ as VERSION
+APP_NAME = "Lite Game Recorder"  # kept: names the real installed files
 EXE_NAME = "LiteGameRecorder.exe"
 
 # Modern dark theme — the same palette as the main app, so the

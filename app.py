@@ -98,7 +98,7 @@ try:
 except Exception:
     HAS_MIC = False
 
-APP_NAME = "Lite Tutorial Maker v2.4"
+from app_version import APP_DISPLAY_NAME as APP_NAME, __version__
 
 # RTMP ingest URLs. The stream key is yours - never share it.
 # YouTube / Twitch / Facebook / Kick all speak RTMP, so "any platform"
@@ -3232,7 +3232,7 @@ class App(ctk.CTk):
     def _show_about(self):
         messagebox.showinfo(
             "About Lite Tutorial Maker",
-            "Lite Tutorial Maker v2.4\n\n"
+            APP_NAME + "\n\n"
             "Make tutorial and explainer videos, free:\n"
             "record, mark chapters (M), draw on the screen,\n"
             "auto captions, one-click tutorial export.\n\n"
@@ -3289,7 +3289,7 @@ class App(ctk.CTk):
         _tl.pack(side="left", padx=14, pady=8)
         ctk.CTkLabel(_tl, text="🎓", font=("Segoe UI", 22)).pack(side="left")
         ctk.CTkLabel(_tl, text="Lite Tutorial Maker", font=("Segoe UI", 16, "bold"), text_color=TEXT).pack(side="left", padx=8)
-        ctk.CTkLabel(_tl, text="v2.4", font=("Segoe UI", 11, "bold"), text_color=MUTED,
+        ctk.CTkLabel(_tl, text="v" + __version__, font=("Segoe UI", 11, "bold"), text_color=MUTED,
                      fg_color=PANEL2, corner_radius=999, width=44, height=22).pack(side="left", padx=2)
         _tr = ctk.CTkFrame(top, fg_color="transparent")
         _tr.pack(side="right", padx=14, pady=8)
@@ -4556,7 +4556,7 @@ if __name__ == "__main__":
         root.withdraw()
         messagebox.showerror(
             "CustomTkinter is missing",
-            "Lite Tutorial Maker v2 needs CustomTkinter for its new design.\n\n"
+            APP_NAME + " needs CustomTkinter for its new design.\n\n"
             "Please run:\n  pip install -r requirements.txt\n\n"
             "Or double-click run.sh (Mac/Linux) / run.bat (Windows), which does it for you.",
         )

@@ -13,7 +13,7 @@ a = Analysis(
     hiddenimports=[
         'cv2', 'numpy', 'mss', 'PIL', 'PIL.Image', 'PIL.ImageTk',
         'sounddevice', 'pynput', 'pynput.mouse', 'pynput.keyboard',
-        'customtkinter', 'editor', 'installer',
+        'customtkinter', 'editor', 'installer', 'app_version',
     ],
     hookspath=[],
     hooksconfig={},
