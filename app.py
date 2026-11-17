@@ -1,5 +1,12 @@
 """
-Lite Game Recorder v2.1 - Screen + Facecam for light / low-end laptops
+Lite Tutorial Maker v2.4 - Tutorial and explainer videos, free and simple
+  * Record your screen + facecam, mark chapters as you go (M key),
+    draw on the screen while you explain
+  * Editor: auto captions (.srt), chapter timeline, one-click
+    tutorial export (1080p H.264 + chapters.txt for YouTube)
+  * Game recording, live streaming, replay buffer, memes and
+    sounds are still in there - they are features now, not the
+    whole app
   * Modern CustomTkinter UI, cross-platform (Windows / macOS / Linux)
   * Live streaming to any RTMP platform: YouTube, Twitch, Facebook, Kick, Custom
 -----------------------------------------------------------------
@@ -56,7 +63,7 @@ except Exception as e:
         root = tk.Tk()
         root.withdraw()
         messagebox.showerror(
-            "Lite Game Recorder cannot start",
+            "Lite Tutorial Maker cannot start",
             "The design library (customtkinter) could not be loaded.\n\n"
             f"{type(e).__name__}: {e}\n\n"
             "The full error was saved to error.log next to app.py.\n"
@@ -91,7 +98,7 @@ try:
 except Exception:
     HAS_MIC = False
 
-APP_NAME = "Lite Game Recorder v2.3"
+APP_NAME = "Lite Tutorial Maker v2.4"
 
 # RTMP ingest URLs. The stream key is yours - never share it.
 # YouTube / Twitch / Facebook / Kick all speak RTMP, so "any platform"
@@ -3210,20 +3217,25 @@ class App(ctk.CTk):
         m = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Help", menu=m)
         m.add_command(label="Keyboard shortcuts", command=self._show_shortcuts)
-        m.add_command(label="About Lite Game Recorder", command=self._show_about)
+        m.add_command(label="About Lite Tutorial Maker", command=self._show_about)
 
     def _show_shortcuts(self):
         messagebox.showinfo(
             "Keyboard shortcuts",
             "F9   Start / Stop recording\n"
-            "F10   Pause / Resume recording\n\n"
+            "F10   Pause / Resume recording\n"
+            "M   Mark a chapter (while recording)\n"
+            "Esc   Stop drawing on the screen\n\n"
             "Everything in the menu bar also has a button or switch\n"
             "in the sidebar with the same name.")
 
     def _show_about(self):
         messagebox.showinfo(
-            "About Lite Game Recorder",
-            "Lite Game Recorder v2.3\n\n"
+            "About Lite Tutorial Maker",
+            "Lite Tutorial Maker v2.4\n\n"
+            "Make tutorial and explainer videos, free:\n"
+            "record, mark chapters (M), draw on the screen,\n"
+            "auto captions, one-click tutorial export.\n\n"
             "Screen + Facecam + Mic + Game sound\n"
             "Live to YouTube, Twitch, Facebook, Kick or any RTMP\n"
             "Character filters for your facecam (facecam only)\n"
@@ -3275,9 +3287,9 @@ class App(ctk.CTk):
         top.pack_propagate(False)
         _tl = ctk.CTkFrame(top, fg_color="transparent")
         _tl.pack(side="left", padx=14, pady=8)
-        ctk.CTkLabel(_tl, text="🎮", font=("Segoe UI", 22)).pack(side="left")
-        ctk.CTkLabel(_tl, text="Lite Game Recorder", font=("Segoe UI", 16, "bold"), text_color=TEXT).pack(side="left", padx=8)
-        ctk.CTkLabel(_tl, text="v2.3", font=("Segoe UI", 11, "bold"), text_color=MUTED,
+        ctk.CTkLabel(_tl, text="🎓", font=("Segoe UI", 22)).pack(side="left")
+        ctk.CTkLabel(_tl, text="Lite Tutorial Maker", font=("Segoe UI", 16, "bold"), text_color=TEXT).pack(side="left", padx=8)
+        ctk.CTkLabel(_tl, text="v2.4", font=("Segoe UI", 11, "bold"), text_color=MUTED,
                      fg_color=PANEL2, corner_radius=999, width=44, height=22).pack(side="left", padx=2)
         _tr = ctk.CTkFrame(top, fg_color="transparent")
         _tr.pack(side="right", padx=14, pady=8)
@@ -3581,7 +3593,7 @@ class App(ctk.CTk):
         ctk.CTkEntry(b, textvariable=self.out_var, fg_color=PANEL2, border_color=BORDER, text_color=TEXT, font=("Segoe UI", 11)).pack(fill="x", pady=(2, 6))
         ctk.CTkButton(b, text="Browse…", command=self._browse, fg_color=PANEL2, hover_color=BORDER, text_color=TEXT, font=("Segoe UI", 11), height=30).pack(fill="x")
         ctk.CTkButton(b, text="⌨️  Keyboard shortcuts", command=self._show_shortcuts, fg_color=PANEL2, hover_color=BORDER, text_color=TEXT, font=("Segoe UI", 11), height=30).pack(fill="x", pady=(8, 0))
-        ctk.CTkButton(b, text="ℹ️  About Lite Game Recorder", command=self._show_about, fg_color=PANEL2, hover_color=BORDER, text_color=TEXT, font=("Segoe UI", 11), height=30).pack(fill="x", pady=(4, 0))
+        ctk.CTkButton(b, text="ℹ️  About Lite Tutorial Maker", command=self._show_about, fg_color=PANEL2, hover_color=BORDER, text_color=TEXT, font=("Segoe UI", 11), height=30).pack(fill="x", pady=(4, 0))
         ctk.CTkButton(b, text="🗑  Uninstall app…", command=self._uninstall_app, fg_color="transparent", hover_color="#3a2020", text_color="#ff8080", border_color="#5a2a2a", border_width=1, font=("Segoe UI", 11), height=30).pack(fill="x", pady=(8, 0))
 
         self._show_app_section("Record")
@@ -4336,7 +4348,7 @@ class App(ctk.CTk):
         if ch:
             self.status_var.set(
                 f"Chapter marked: {ch['title']} at {format_chapter_time(ch['time'])} "
-                f"({len(self.recorder.chapters)} so far) — rename it in the editor")
+                f"({len(self.recorder.chapters)} so far). Rename it in the editor")
 
     # ---------- screen annotation (v2.4) ----------
     # A transparent fullscreen overlay: the user draws a yellow
@@ -4395,7 +4407,7 @@ class App(ctk.CTk):
         ov.focus_force()
         self.annotate_btn.configure(fg_color=AMBER, text_color="#0F1218")
         self.annot_clear_btn.configure(state="normal")
-        self.status_var.set("Drawing on the screen — drag to highlight. Press Esc to stop drawing and click normally.")
+        self.status_var.set("Drawing on the screen: drag to highlight. Press Esc to stop drawing and click normally.")
 
     def _hide_annotate(self):
         if self._annot_overlay is not None:
@@ -4417,7 +4429,7 @@ class App(ctk.CTk):
                 self._annot_canvas.delete("all")
             except Exception:
                 pass
-            self.status_var.set("Drawing cleared — strokes already recorded stay in the video.")
+            self.status_var.set("Drawing cleared. Strokes already recorded stay in the video.")
 
     def _on_status(self, elapsed=None, dropped=None, written=None, done=False, path=None, mic_active=None, note="", phase=None):
         def ui():
@@ -4544,7 +4556,7 @@ if __name__ == "__main__":
         root.withdraw()
         messagebox.showerror(
             "CustomTkinter is missing",
-            "Lite Game Recorder v2 needs CustomTkinter for its new design.\n\n"
+            "Lite Tutorial Maker v2 needs CustomTkinter for its new design.\n\n"
             "Please run:\n  pip install -r requirements.txt\n\n"
             "Or double-click run.sh (Mac/Linux) / run.bat (Windows), which does it for you.",
         )

@@ -1,4 +1,14 @@
-# 🎮 Lite Game Recorder v2.3 — Screen + Facecam + Live, for any platform
+# 🎓 Lite Tutorial Maker v2.4 - Turn a screen recording into a polished tutorial
+
+Teachers, trainers, and developers need clear tutorial videos, but OBS is too complex and Camtasia/Loom cost money. Lite Tutorial Maker is the free, simple tool that turns a screen recording into a polished tutorial in one click. Game recording, live streaming, and memes are still in there, as features, not the whole app.
+
+## 🎓 Tutorial Maker: the workflow
+
+**1. Record with chapters.** Press Record (F9) and explain as you go. Whenever you move to a new topic, press **M** (or the 🔖 button) to drop a chapter marker. Need to point at something? Press the ✏️ button and draw a yellow highlight right on the screen, Esc stops drawing. Chapters are saved next to the video as a `.chapters.json` file.
+
+**2. Generate captions.** Open the video in the editor (Edit video button). The chapters show as gold markers on the timeline, click one to rename it. Press **Generate captions (.srt)** in the Project panel: the app listens to your speech and writes an `.srt` file next to the video, and turns caption burn-in on. Captions need the free offline speech engine (`pip install -r requirements-smart.txt`); without it the app says so plainly and keeps working.
+
+**3. Export tutorial.** Press **🎓 Export tutorial** in the editor top bar. You get a 1080p H.264 video (CRF 23, easy to share anywhere), captions burned in when generated, an `.srt` next to it, and a `chapters.txt` file with YouTube style `MM:SS Title` lines, ready to paste into your video description.
 
 ## 🪟 Windows: install it as a real app (like v1.5)
 
@@ -20,6 +30,18 @@ This usually means **Python is not installed**, or the app crashed and the old l
 3. Double-click **run.bat** again. The first run takes 1–2 minutes and needs internet.
 4. If it still does not open, double-click **Diagnose.bat** — it writes `diagnose.txt` in the same folder. Send me that file and I will tell you the exact fix.
 5. If Windows says "Windows protected your PC", click **More info** → **Run anyway**.
+
+## What's new - Tutorial Maker v2.4 (Nov 2026)
+
+**🔖 Chapters while recording** - press M (or the 🔖 button) during a recording to drop a timestamped chapter marker. Chapters save as `.chapters.json` next to the video, show as gold markers on the editor timeline (click one to rename it), and export as a YouTube style `chapters.txt`.
+
+**📝 Generate captions (.srt)** - one button in the editor transcribes your speech with the offline Whisper engine, writes an `.srt` next to the video, and turns caption burn-in on for the export. No speech engine installed? The app tells you how to install it and carries on.
+
+**🎓 Export tutorial** - one click in the editor top bar: 1080p, H.264 at CRF 23, captions burned in when generated, `chapters.txt` alongside. The normal Export is unchanged.
+
+**✏️ Draw on the screen** - while recording, press the ✏️ button and draw a yellow highlight freehand on the screen. The recording captures it. Esc stops drawing, 🗑 clears it. Windows only (it uses a transparent overlay).
+
+**New name** - the app is now Lite Tutorial Maker. Game recording, live, replay buffer, memes, and sounds all still work exactly as before.
 
 ## What's new — Responsive design + memes (Nov 2026)
 

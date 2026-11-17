@@ -1,4 +1,4 @@
-"""Video Editor - CapCut-style editor inside Lite Game Recorder.
+"""Video Editor - CapCut-style editor inside Lite Tutorial Maker.
 
 Not an exact copy of CapCut (CapCut is a huge app made by a big
 team, with online templates and cloud effects) - but the same kind
@@ -639,7 +639,7 @@ def project_from_dict(data):
     longer exist on this PC. Those clips are left out (an export
     would fail on them), and the caller warns the user about them."""
     if not isinstance(data, dict) or not isinstance(data.get("clips"), list):
-        raise ValueError("That file is not a Lite Game Recorder project.")
+        raise ValueError("That file is not a Lite Tutorial Maker project.")
     project = {
         "clips": [], "transition": str(data.get("transition", "None")),
         "ratio": str(data.get("ratio", "16:9  Landscape")),
@@ -3072,7 +3072,7 @@ class VideoEditor(ctk.CTkToplevel):
 
     def __init__(self, master, initial_path=None, on_exported=None):
         super().__init__(master)
-        self.title("Video Editor — Lite Game Recorder")
+        self.title("Video Editor - Lite Tutorial Maker")
         self.geometry("1400x860")
         self.minsize(1100, 700)
         self.configure(fg_color=CC_BG)
@@ -4022,7 +4022,7 @@ class VideoEditor(ctk.CTkToplevel):
                 self._preview_key = None
                 self._refresh_all()
             if written and not errors:
-                self._status_var.set("Captions saved: %s — Auto captions is ON, so the export burns them in." % ", ".join(written))
+                self._status_var.set("Captions saved: %s. Auto captions is ON, so the export burns them in." % ", ".join(written))
                 messagebox.showinfo("Captions generated",
                                     "Saved:\n" + "\n".join("  " + w for w in written) +
                                     "\n\nAuto captions is ON, so the export burns them into the video too.")
@@ -4892,7 +4892,7 @@ class VideoEditor(ctk.CTkToplevel):
         if added:
             self.project["chapters"].sort(key=lambda x: x["time"])
             self._status_var.set(
-                "Loaded %d chapter(s) from %s — click a gold marker on the timeline to rename it."
+                "Loaded %d chapter(s) from %s. Click a gold marker on the timeline to rename it."
                 % (added, Path(c["path"]).name))
 
     def _add_meme_video(self, path, label, at_time=None, save_settings=True):
@@ -7040,14 +7040,14 @@ class VideoEditor(ctk.CTkToplevel):
             when = "%.1fs" % float(chapter.get("time", 0.0) or 0.0)
         new = simpledialog.askstring(
             "Rename chapter",
-            "Chapter at %s — new name:" % when,
+            "Chapter at %s. New name:" % when,
             initialvalue=str(chapter.get("title", "") or "Chapter"),
             parent=self)
         if new is None:
             return
         new = new.strip()
         if not new:
-            self._status_var.set("Chapter name kept — an empty name is not allowed.")
+            self._status_var.set("Chapter name kept: an empty name is not allowed.")
             return
         chapter["title"] = new
         self._snapshot()
