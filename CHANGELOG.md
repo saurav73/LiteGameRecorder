@@ -11,6 +11,14 @@ built from that tag.
 
 (nothing yet)
 
+## 2.5.1 - 2026-11-17
+
+- Fixed: the macOS release build. The evermeet.cx download endpoint
+  the workflow used now returns 410 Gone, so the macOS build failed
+  and v2.5.0 was never published. The workflow now downloads the
+  ffmpeg 9.0.2 zip directly. No app changes; this release contains
+  everything listed under 2.5.0.
+
 ## 2.5.0 - 2026-11-17
 
 - Multi-OS portable builds: one GitHub Actions matrix build now

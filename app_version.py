@@ -16,7 +16,7 @@ exe (or next to the .app on macOS), never in a temp dir.
 import sys
 from pathlib import Path
 
-__version__ = "2.5.0"
+__version__ = "2.5.1"
 APP_NAME = "Lite Tutorial Maker"
 APP_DISPLAY_NAME = f"{APP_NAME} v{__version__}"
 
