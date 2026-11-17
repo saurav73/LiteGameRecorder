@@ -2,7 +2,7 @@
 
 How versioning and releases work for this project. Follow this on
 every change so the version in the app, the changelog, the git tag,
-and the Windows download always agree.
+and the downloads always agree.
 
 ## Version numbers
 
@@ -33,11 +33,15 @@ window title, and the setup window all read from it.
 5. Tag the release: `git tag -a vX.Y.Z -m "Lite Tutorial Maker vX.Y.Z - <one line>"`.
 6. Push the commit and the tag: `git push origin main` then
    `git push origin vX.Y.Z`.
-7. The GitHub Actions workflow (`.github/workflows/build-windows.yml`)
-   builds the Windows exe, bundles FFmpeg plus sounds, meme videos,
-   and templates, and publishes a Release with the zip attached.
-   The download link is then:
+7. The GitHub Actions workflow (`.github/workflows/build-release.yml`)
+   builds the app on Windows, macOS, and Linux, bundles each OS's
+   FFmpeg plus sounds, meme videos, and templates, and publishes
+   one Release with three zips attached. A release only publishes
+   when all three OS builds succeed. The download links are then:
    `https://github.com/saurav73/LiteGameRecorder/releases/download/vX.Y.Z/LiteGameRecorder-vX.Y.Z-Windows.zip`
+   (and the same pattern for `-macOS.zip` and `-Linux.zip`). The
+   built-in updater matches assets by the OS name in the file name,
+   so never rename the assets.
 
 ## Rules
 

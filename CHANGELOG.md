@@ -4,11 +4,28 @@ All notable changes to Lite Tutorial Maker are documented here.
 Version numbers follow Semantic Versioning (MAJOR.MINOR.PATCH):
 a patch bumps for fixes, a minor bumps for new features, a major
 bumps for breaking changes. Every version below has a matching
-git tag (vX.Y.Z) and a Windows release built from that tag.
+git tag (vX.Y.Z) and portable releases (Windows, macOS, Linux)
+built from that tag.
 
 ## Unreleased
 
-(nothing yet)
+- Multi-OS portable builds: one GitHub Actions matrix build now
+  produces a portable zip for Windows, macOS, and Linux. Each zip
+  extracts anywhere and runs with no install (app + FFmpeg +
+  sounds + meme videos + templates). macOS gets a real .app bundle;
+  Linux gets a single binary. The app folder is fully portable:
+  config.json, sounds, meme videos, templates, and FFmpeg are all
+  found next to the exe (or next to the .app on macOS) instead of
+  a temp dir, so the whole folder works from a USB stick.
+- Built-in auto-updater: install once, then update in place. The
+  app checks GitHub Releases (at most once a day, silently when
+  there is nothing new), downloads the zip for your OS, verifies
+  it, and swaps the app files, keeping config.json, Recordings/,
+  and anything you added. Help menu, Check for updates, checks on
+  demand. Source checkouts get a link to the releases page.
+- Source launchers: run.sh (macOS/Linux), run.bat (Windows), and
+  run.command (macOS double-click) now exist; the error messages
+  and README already told users to run them.
 
 ## 2.4.1 - 2026-11-17
 

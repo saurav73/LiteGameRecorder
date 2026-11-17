@@ -10,6 +10,18 @@ Teachers, trainers, and developers need clear tutorial videos, but OBS is too co
 
 **3. Export tutorial.** Press **🎓 Export tutorial** in the editor top bar. You get a 1080p H.264 video (CRF 23, easy to share anywhere), captions burned in when generated, an `.srt` next to it, and a `chapters.txt` file with YouTube style `MM:SS Title` lines, ready to paste into your video description.
 
+## ⬇️ Download (Windows, macOS, Linux)
+
+No install needed. Get the latest release from the [Releases page](https://github.com/saurav73/LiteGameRecorder/releases), download the zip for your system, extract it anywhere, and run the app. Every zip has FFmpeg bundled (so sound works out of the box), plus the sounds, meme videos, and templates. Your settings (`config.json`) and recordings stay next to the app, so the whole folder is portable, including on a USB stick.
+
+- **Windows:** `LiteGameRecorder-*-Windows.zip`. Extract, double-click `LiteGameRecorder.exe`.
+- **macOS:** `LiteGameRecorder-*-macOS.zip`. Extract, move the folder out of Downloads, double-click `LiteGameRecorder.app`. The first run may need a right-click, Open, because the app is not signed. Screen annotation (draw on screen while recording) needs Windows and is not available on Mac.
+- **Linux:** `LiteGameRecorder-*-Linux.zip`. Extract, run `./LiteGameRecorder`. Needs X11 (or XWayland) for screen capture. Screen annotation needs Windows and is not available on Linux.
+
+## 🔄 Updates: install once, update in place
+
+You only download the full zip once. After that, the app checks for new versions by itself (at most once a day, silently when there is nothing new) and offers to update with one click: it downloads the new version, restarts, and comes back updated. Your settings and recordings are kept. You can also check any time from the Help menu, Check for updates. Running from source instead? The app will point you at the Releases page, since a source checkout cannot update itself.
+
 ## 🪟 Windows: install it as a real app (like v1.5)
 
 You do **not** need to use `run.bat` any more. v2.3.2 brings back the v1.5 one-click installer:
