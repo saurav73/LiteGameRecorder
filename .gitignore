@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+env/
+
+# App runtime files (per-PC, never in the repo)
+config.json
+error.log
+run.log
+diagnose.txt
+openrouter_key.txt
+*.log
+
+# Recordings and generated outputs (the project's own meme-videos/
+# and sounds/ folders are tracked and stay in the repo)
+Game_*.mp4
+Game_*.gif
+*.mic.wav
+*.sys.wav
+*_edited.mp4
+*_edited.srt
+*_video_only.mp4
+*.chapters.json
+*_chapters.txt
+recordings/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -682,6 +682,63 @@ def transcribe_wav(wav_path, model=None):
     except Exception as e:
         return ([], "", f"Speech check failed: {e}")
 
+
+# ---------- chapters (Tutorial Maker, v2.4) ----------
+# A chapter is {"time": seconds into the VIDEO, "title": str}.
+# The recorder saves them as <video>.chapters.json next to the
+# recording; the editor loads them, shows them on the timeline,
+# and writes a YouTube-style chapters.txt on export.
+
+def format_chapter_time(t):
+    """Seconds -> "MM:SS" (or "H:MM:SS" past one hour), the format
+    YouTube chapters use."""
+    t = max(0, int(round(float(t))))
+    h, rem = divmod(t, 3600)
+    m, s = divmod(rem, 60)
+    if h:
+        return f"{h}:{m:02d}:{s:02d}"
+    return f"{m:02d}:{s:02d}"
+
+
+def chapters_to_text(chapters, ensure_start=True):
+    """Chapter list -> YouTube description lines, "MM:SS Title".
+    With ensure_start, a missing 00:00 chapter is added as
+    "Intro": YouTube only shows chapters when the first one is
+    at 00:00."""
+    items = sorted(({"time": float(c.get("time", 0.0)),
+                     "title": str(c.get("title", "")).strip() or "Chapter"}
+                    for c in (chapters or [])),
+                   key=lambda c: c["time"])
+    if ensure_start and (not items or items[0]["time"] > 0.5):
+        items.insert(0, {"time": 0.0, "title": "Intro"})
+    return "\n".join(f"{format_chapter_time(c['time'])} {c['title']}"
+                     for c in items)
+
+
+def save_chapters_json(path, chapters, video_name=""):
+    """Write the chapters file next to a recording."""
+    data = {"version": 1, "video": video_name,
+            "chapters": [{"time": round(float(c.get("time", 0.0)), 2),
+                          "title": str(c.get("title", ""))}
+                         for c in (chapters or [])]}
+    Path(path).write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
+def load_chapters_json(path):
+    """Read a .chapters.json file. Returns the chapter list, or []
+    when the file is missing or unreadable (never raises)."""
+    try:
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        raw = data.get("chapters", []) if isinstance(data, dict) else []
+        out = []
+        for c in raw:
+            if isinstance(c, dict) and "time" in c:
+                out.append({"time": float(c["time"]),
+                            "title": str(c.get("title", "") or "Chapter")})
+        return sorted(out, key=lambda c: c["time"])
+    except Exception:
+        return []
+
 class SmartChecker:
     """Keeps score while you speak: expected script words, what was
     heard so far, mistakes, accuracy, and what to say next."""
@@ -1577,6 +1634,9 @@ class Recorder:
         self.smart_result = None
         self.smart_report_path = None
         self.smart_srt_path = None
+        # v2.4 - tutorial chapters: [{"time": video seconds, "title": str}]
+        self.chapters = []
+        self._chapter_lock = threading.Lock()
         # v1.4: mouse/keyboard tracking + click-zoom state
         self._mouse_listener = None
         self._kb_listener = None
@@ -2092,6 +2152,15 @@ class Recorder:
             note += " (Game sound was on but nothing was captured - see the Audio card's Check button for setup.)"
         if self.cfg.get("gif"):
             note += self._make_gif(str(self.output_path.with_suffix(".gif")))
+        # v2.4 - tutorial chapters: save them next to the video so
+        # the editor can load them (and the user can rename them).
+        if self.chapters:
+            try:
+                ch_path = self.output_path.with_suffix(".chapters.json")
+                save_chapters_json(ch_path, self.chapters, self.output_path.name)
+                note += f" {len(self.chapters)} chapter(s) saved ({ch_path.name})."
+            except Exception:
+                pass
         self.recording = False
         self.on_status(done=True, path=str(self.output_path), mic_active=self.mic_active, note=note)
 
@@ -2296,6 +2365,7 @@ class Recorder:
         self._pause_intervals = []
         self._pause_started = None
         self._voice_changes = []
+        self.chapters = []  # v2.4: fresh chapter list per recording
         self._voice_start = cfg.get("voice", "Off")
         if cfg.get("mic") and HAS_MIC:
             self._mic_wav = str(self.output_path.with_suffix(".mic.wav"))
@@ -2696,6 +2766,22 @@ class Recorder:
             return self.paused
         return False
 
+    def add_chapter(self, title=None):
+        """Drop a timestamped chapter marker at the current point
+        in the recording. Returns the chapter dict, or None when
+        not recording. The time is in VIDEO seconds (active
+        recording time divided by the speed setting), so it
+        matches the timeline in the editor."""
+        if not self.recording:
+            return None
+        speed = max(0.1, float(self.cfg.get("speed", 1.0)))
+        t = max(0.0, self._active_seconds / speed)
+        with self._chapter_lock:
+            n = len(self.chapters) + 1
+            ch = {"time": round(t, 2), "title": title or f"Chapter {n}"}
+            self.chapters.append(ch)
+            return dict(ch)
+
     def set_voice(self, voice):
         """Change the voice changer live, while recording. The change
         is stamped in mic time; _mux_audio applies the new voice from
@@ -2874,6 +2960,10 @@ class App(ctk.CTk):
         self.bind("<F9>", lambda e: self.toggle_record())
         self.bind("<F10>", lambda e: self.toggle_pause())
         self.bind("<F11>", lambda e: self._save_replay())
+        # v2.4 - M drops a chapter marker while recording. Window-local
+        # on purpose: a global M hotkey would fire while typing.
+        self.bind("<m>", self._on_m_key)
+        self.bind("<M>", self._on_m_key)
         self.after(120, self._preview_tick)
         self.after(600, self._smart_tick)
         # Responsiveness: when the window is resized, the panels
@@ -3267,7 +3357,7 @@ class App(ctk.CTk):
         transport.grid_columnconfigure(2, weight=1, uniform="a")
         _bl = ctk.CTkFrame(transport, fg_color="transparent")
         _bl.grid(row=0, column=0, sticky="w", padx=14, pady=12)
-        ctk.CTkLabel(_bl, text="F9  Start / Stop\nF10  Pause / Resume\nF11  Save replay",
+        ctk.CTkLabel(_bl, text="F9  Start / Stop\nF10  Pause / Resume\nF11  Save replay\nM  Add chapter",
                      font=("Segoe UI", 11), text_color=MUTED, justify="left").pack(anchor="w")
         _bc = ctk.CTkFrame(transport, fg_color="transparent")
         _bc.grid(row=0, column=1, pady=10)
@@ -3293,6 +3383,13 @@ class App(ctk.CTk):
                                                    font=("Segoe UI", 18), width=56, height=56, corner_radius=18)
         self._transport_replay_btn.pack(side="left", padx=6)
         ToolTip(self._transport_replay_btn, "Save the last moments as a replay video (F11).\nTurn Instant Replay on in the Session panel first.")
+        # v2.4 - tutorial chapter marker: drops a timestamped
+        # chapter at the current point in the recording (M key).
+        self.chapter_btn = ctk.CTkButton(_bc, text="🔖", command=self._add_chapter, state="disabled",
+                                         fg_color=PANEL2, hover_color=BORDER, text_color=TEXT,
+                                         font=("Segoe UI", 18), width=56, height=56, corner_radius=18)
+        self.chapter_btn.pack(side="left", padx=6)
+        ToolTip(self.chapter_btn, "Mark a chapter here (M).\nChapters are saved next to the video and show on the editor timeline, where you can rename them.")
         _br = ctk.CTkFrame(transport, fg_color="transparent")
         _br.grid(row=0, column=2, sticky="e", padx=14, pady=12)
         rec_btn = ctk.CTkButton(_br, text="📂  Recordings", command=self._open_folder,
@@ -4195,6 +4292,7 @@ class App(ctk.CTk):
         _round_button_set(self.record_btn, glyph="■", fg_color=PANEL2,
                           hover_color=BORDER, corner_radius=18, state="normal")
         self.pause_btn.configure(state="normal")
+        self.chapter_btn.configure(state="normal")
         self._update_live_badge()
 
     def toggle_pause(self):
@@ -4202,6 +4300,25 @@ class App(ctk.CTk):
             paused = self.recorder.toggle_pause()
             self.pause_btn.configure(text="▶" if paused else "⏸")
             self.status_var.set("Paused" if paused else "Recording…")
+
+    def _on_m_key(self, _event=None):
+        # M drops a chapter marker, unless the user is typing in a
+        # text box (then the letter belongs to the text).
+        focus = self.focus_get()
+        if focus is not None and isinstance(focus, (tk.Entry, ctk.CTkEntry)):
+            return
+        self._add_chapter()
+
+    def _add_chapter(self):
+        """Drop a chapter marker at the current point in the
+        recording (button or M key)."""
+        if not (self.recorder and self.recorder.recording):
+            return
+        ch = self.recorder.add_chapter()
+        if ch:
+            self.status_var.set(
+                f"Chapter marked: {ch['title']} at {format_chapter_time(ch['time'])} "
+                f"({len(self.recorder.chapters)} so far) — rename it in the editor")
 
     def _on_status(self, elapsed=None, dropped=None, written=None, done=False, path=None, mic_active=None, note="", phase=None):
         def ui():
@@ -4216,6 +4333,7 @@ class App(ctk.CTk):
                                   hover_color=ACCENT_HOVER, corner_radius=36,
                                   state="normal")
                 self.pause_btn.configure(state="disabled", text="⏸")
+                self.chapter_btn.configure(state="disabled")
                 self._session_file_var.set("")
                 self._update_session_card()
                 self.rec_dot.configure(text_color=MUTED)

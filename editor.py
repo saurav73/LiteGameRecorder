@@ -629,6 +629,7 @@ def project_to_dict(project):
         "letterbox": bool(project.get("letterbox", False)),
         "grain": bool(project.get("grain", False)),
         "sfx": copy.deepcopy(project.get("sfx", [])),
+        "chapters": copy.deepcopy(project.get("chapters", [])),
     }
 
 
@@ -666,6 +667,7 @@ def project_from_dict(data):
         "letterbox": bool(data.get("letterbox", False)),
         "grain": bool(data.get("grain", False)),
         "sfx": copy.deepcopy(data.get("sfx", []) or []),
+        "chapters": copy.deepcopy(data.get("chapters", []) or []),
     }
     missing = []
     for saved in data["clips"]:
@@ -2691,6 +2693,20 @@ def export_project(project, out_path, progress_cb=None, status_cb=None):
         except Exception:
             pass
 
+    # Chapters file (v2.4): YouTube-style "MM:SS Title" lines next
+    # to the video, ready to paste into the video description.
+    # Chapter times are project times, which match the exported
+    # video (transitions shift later chapters by at most 0.5 s).
+    if project.get("chapters"):
+        try:
+            from app import chapters_to_text
+            ch_path = Path(str(out_path)).with_name(
+                Path(str(out_path)).stem + "_chapters.txt")
+            ch_path.write_text(chapters_to_text(project["chapters"]),
+                               encoding="utf-8")
+        except Exception:
+            pass
+
     # Audio: mix the clips' audio (+ music) with FFmpeg, then mux.
     # The real video length is the frames actually written - a
     # transition overlaps the clips, so it is shorter than the
@@ -2907,7 +2923,7 @@ def render_project_audio(project, clips, out_wav):
 # Colours: deep charcoal backgrounds, CapCut's signature teal accent.
 import copy
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, simpledialog
 
 import customtkinter as ctk
 from PIL import Image, ImageTk
@@ -3016,7 +3032,8 @@ class VideoEditor(ctk.CTkToplevel):
                         "normalize": False, "caption_edits": {},
                         "auto_memes": True,
                         "caption_lang": "en", "bg_blur": True,
-                        "sfx": []}  # [{"path":..., "at":seconds, "vol":1.0}]
+                        "sfx": [],  # [{"path":..., "at":seconds, "vol":1.0}]
+                        "chapters": []}  # v2.4: [{"time": project seconds, "title": str}]
         self.on_exported = on_exported
         self._project_path = None  # last .json project file saved / opened
         self._playing = False
@@ -4691,10 +4708,47 @@ class VideoEditor(ctk.CTkToplevel):
             return
         self.project["clips"].append(new_clip(path, info))
         self._sel = len(self.project["clips"]) - 1
+        self._load_chapters_for_clip(self._sel)
         self._snapshot()
         self._refresh_all()
         self._load_clip_settings()
         self._show_frame(self._clip_start_time(self._sel))
+
+    def _load_chapters_for_clip(self, ci):
+        """Chapters recorded with this clip (a .chapters.json next
+        to the video) -> project time, merged into the project.
+        Chapters outside the clip's trim are skipped. Splitting or
+        reordering clips afterwards does not move chapter times:
+        chapters are for the usual one-clip tutorial recording."""
+        clips = self.project["clips"]
+        if ci < 0 or ci >= len(clips):
+            return
+        c = clips[ci]
+        try:
+            from app import load_chapters_json
+            raw = load_chapters_json(
+                Path(c["path"]).with_suffix(".chapters.json"))
+        except Exception:
+            raw = []
+        if not raw:
+            return
+        start = float(c.get("start", 0.0))
+        end = float(c.get("end", 0.0))
+        added = 0
+        for ch in raw:
+            t = float(ch.get("time", 0.0))
+            if t < start or t > end:
+                continue
+            pt = clip_local_to_project(self.project, ci, t - start)
+            self.project.setdefault("chapters", []).append(
+                {"time": round(pt, 2),
+                 "title": str(ch.get("title", "") or "Chapter")})
+            added += 1
+        if added:
+            self.project["chapters"].sort(key=lambda x: x["time"])
+            self._status_var.set(
+                "Loaded %d chapter(s) from %s — click a gold marker on the timeline to rename it."
+                % (added, Path(c["path"]).name))
 
     def _add_meme_video(self, path, label, at_time=None, save_settings=True):
         """Drop a meme video into the project at the playhead (or
@@ -6743,6 +6797,22 @@ class VideoEditor(ctk.CTkToplevel):
                 name = name[:11] + "…"
             self._tl.create_text(x + 7, 96, anchor="w", fill="#fbbf24",
                                  font=("Segoe UI", 8), text="♪ " + name)
+        # Chapter markers (v2.4, Tutorial Maker): a gold line across
+        # the tracks, a diamond in the ruler, and the title. Click
+        # a marker (top strip) to rename the chapter.
+        for ch in (self.project.get("chapters") or []):
+            ct = float(ch.get("time", 0.0) or 0.0)
+            if ct < 0 or ct > total:
+                continue
+            x = label_x + ct * pps
+            self._tl.create_line(x, 22, x, 124, fill=CC_GOLD, width=1)
+            self._tl.create_polygon(x, 14, x + 5, 19, x, 24, x - 5, 19,
+                                    fill=CC_GOLD, outline="")
+            title = str(ch.get("title", "") or "Chapter")
+            if len(title) > 22:
+                title = title[:21] + "…"
+            self._tl.create_text(x + 7, 14, anchor="w", fill=CC_GOLD,
+                                 font=("Segoe UI", 8, "bold"), text=title)
         # AI highlight ranges (gold bars over the video track)
         for (hs, he, _sc) in getattr(self, "_highlights", []):
             x0 = label_x + hs * pps
@@ -6788,6 +6858,14 @@ class VideoEditor(ctk.CTkToplevel):
         label_x, pps, _w = self._tl_geom()
         t = (event.x - label_x) / pps if pps else 0
         t = max(0.0, min(t, total - 0.01))
+        # v2.4: a click on a chapter marker (top strip, near its
+        # line) renames the chapter instead of seeking.
+        if event.y < 30 and pps:
+            for ch in (self.project.get("chapters") or []):
+                cx = label_x + float(ch.get("time", 0.0) or 0.0) * pps
+                if abs(event.x - cx) <= 6:
+                    self._rename_chapter(ch)
+                    return
         # Select the clip under the click, like CapCut does.
         acc = 0.0
         for i, c in enumerate(self.project["clips"]):
@@ -6805,6 +6883,31 @@ class VideoEditor(ctk.CTkToplevel):
         self._playing = False
         self._play_btn._glyph.configure(text="▶")
         self._show_frame(t)
+
+    def _rename_chapter(self, chapter):
+        """Rename one chapter (click its gold marker on the timeline).
+        The new name is saved in the project and used in the
+        chapters.txt written on export."""
+        try:
+            from app import format_chapter_time
+            when = format_chapter_time(chapter.get("time", 0.0))
+        except Exception:
+            when = "%.1fs" % float(chapter.get("time", 0.0) or 0.0)
+        new = simpledialog.askstring(
+            "Rename chapter",
+            "Chapter at %s — new name:" % when,
+            initialvalue=str(chapter.get("title", "") or "Chapter"),
+            parent=self)
+        if new is None:
+            return
+        new = new.strip()
+        if not new:
+            self._status_var.set("Chapter name kept — an empty name is not allowed.")
+            return
+        chapter["title"] = new
+        self._snapshot()
+        self._draw_timeline()
+        self._status_var.set("Chapter renamed to '%s'." % new)
 
     # ---------- export ----------
     def _read_project_settings(self):
