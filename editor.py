@@ -2714,7 +2714,11 @@ def export_project(project, out_path, progress_cb=None, status_cb=None):
     if status_cb:
         status_cb("Mixing audio…")
     video_dur = written / fps if fps else total_dur
-    final = export_audio(project, clips, tmp_video, str(out_path), video_dur)
+    # Tutorial export (v2.4): H.264 CRF 23 instead of the mp4v copy,
+    # for a file that shares easily anywhere.
+    tutorial = bool(project.get("tutorial_export"))
+    final = export_audio(project, clips, tmp_video, str(out_path), video_dur,
+                         reencode=tutorial)
     for rev in rev_files:
         try:
             if os.path.exists(rev):
@@ -2724,6 +2728,19 @@ def export_project(project, out_path, progress_cb=None, status_cb=None):
     if final is None:
         # No audio to mix (or FFmpeg missing) - the video-only file
         # is still a valid export, so move it to the final name.
+        # A tutorial export re-encodes it to H.264 first when
+        # FFmpeg is available.
+        if tutorial and ffmpeg_available():
+            if status_cb:
+                status_cb("Encoding tutorial video (H.264)…")
+            if _reencode_h264(tmp_video, str(out_path)):
+                try:
+                    os.remove(tmp_video)
+                except OSError:
+                    pass
+                if progress_cb:
+                    progress_cb(1.0)
+                return True, "Exported: %s (tutorial: 1080p H.264, video only - no audio to mix)%s" % (Path(out_path).name, caption_note)
         try:
             shutil.move(tmp_video, str(out_path))
         except Exception as exc:
@@ -2737,7 +2754,8 @@ def export_project(project, out_path, progress_cb=None, status_cb=None):
         pass
     if progress_cb:
         progress_cb(1.0)
-    return True, "Exported: %s%s" % (Path(out_path).name, caption_note)
+    tut_note = " (tutorial: 1080p H.264)" if tutorial and final == "reencoded" else ""
+    return True, "Exported: %s%s%s" % (Path(out_path).name, tut_note, caption_note)
 
 
 def _audio_mix_parts(project, clips, total_dur, first_idx=1):
@@ -2862,27 +2880,66 @@ def _audio_mix_parts(project, clips, total_dur, first_idx=1):
     return inputs, filters, mixed
 
 
-def export_audio(project, clips, video_path, out_path, total_dur):
+def _reencode_h264(src, dst, crf=23):
+    """Re-encode a video to H.264 (CRF 23, veryfast) with FFmpeg.
+    Returns True on success. Used by the tutorial export for the
+    video-only path (no audio to mix)."""
+    if not ffmpeg_available():
+        return False
+    cmd = [_ffmpeg(), "-y", "-v", "error", "-i", str(src),
+           "-c:v", "libx264", "-crf", str(crf), "-preset", "veryfast",
+           "-pix_fmt", "yuv420p", str(dst)]
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+    except Exception:
+        return False
+    return res.returncode == 0 and os.path.exists(dst)
+
+
+def export_audio(project, clips, video_path, out_path, total_dur, reencode=False):
     """Mix clip audio (+ optional music + sound effects) onto
-    video_path with FFmpeg. Returns True on success, None when there
-    is nothing to mix or FFmpeg is missing (caller then ships the
-    video-only file)."""
+    video_path with FFmpeg. Returns "reencoded" when the video was
+    re-encoded with H.264, "copied" when the video stream was
+    copied as-is, or None when there is nothing to mix or FFmpeg
+    is missing (caller then ships the video-only file).
+    reencode=True (tutorial export) re-encodes the video with
+    H.264 CRF 23 instead of copying the mp4v stream; if the
+    encoder is missing it falls back to a copy so the export
+    still succeeds."""
     if not ffmpeg_available():
         return None
     inputs, filters, mixed = _audio_mix_parts(project, clips, total_dur, first_idx=1)
     if mixed is None:
         return None
+    video_args = ["-c:v", "copy"]
+    if reencode:
+        video_args = ["-c:v", "libx264", "-crf", "23", "-preset", "veryfast",
+                      "-pix_fmt", "yuv420p"]
     cmd = [_ffmpeg(), "-y", "-v", "error", "-i", video_path] + inputs + [
         "-filter_complex", ";".join(filters),
-        "-map", "0:v", "-map", mixed, "-c:v", "copy", "-c:a", "aac",
+        "-map", "0:v", "-map", mixed] + video_args + ["-c:a", "aac",
         "-t", "%.3f" % total_dur, str(out_path)]
     try:
         res = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
     except Exception:
         return None
     if res.returncode != 0 or not os.path.exists(out_path):
+        if reencode:
+            # libx264 missing or failed: fall back to a plain copy
+            # so the export still succeeds.
+            cmd2 = [_ffmpeg(), "-y", "-v", "error", "-i", video_path] + inputs + [
+                "-filter_complex", ";".join(filters),
+                "-map", "0:v", "-map", mixed, "-c:v", "copy", "-c:a", "aac",
+                "-t", "%.3f" % total_dur, str(out_path)]
+            try:
+                res2 = subprocess.run(cmd2, capture_output=True, text=True, timeout=600)
+            except Exception:
+                return None
+            if res2.returncode != 0 or not os.path.exists(out_path):
+                return None
+            return "copied"
         return None
-    return True
+    return "reencoded" if reencode else "copied"
 
 
 def render_project_audio(project, clips, out_wav):
@@ -3142,6 +3199,13 @@ class VideoEditor(ctk.CTkToplevel):
             text_color="#0F1218", font=("Segoe UI", 13, "bold"),
             width=110, height=36, corner_radius=999, command=self._export)
         self._export_btn.pack(side="right", padx=14, pady=8)
+        # v2.4: one-click tutorial export (1080p, H.264, captions
+        # burned in when generated, chapters.txt alongside).
+        self._export_tutorial_btn = ctk.CTkButton(
+            top, text="🎓 Export tutorial", fg_color=CC_TEAL, hover_color=CC_TEAL_HOVER,
+            text_color="#0F1218", font=("Segoe UI", 13, "bold"),
+            width=150, height=36, corner_radius=999, command=self._export_tutorial)
+        self._export_tutorial_btn.pack(side="right", padx=2, pady=8)
         ctk.CTkButton(top, text="?", width=36, height=36, fg_color=CC_CARD,
                       hover_color=CC_BORDER, text_color=CC_TEXT,
                       font=("Segoe UI", 14, "bold"), corner_radius=10,
@@ -7014,6 +7078,38 @@ class VideoEditor(ctk.CTkToplevel):
         self.project["grain"] = bool(self._grain_var.get())
         self.project["captions"] = bool(self._captions_var.get())
 
+    def _captions_available(self):
+        """True when captions were already generated for at least
+        one clip (edited captions, or an .srt next to the video)."""
+        edits = self.project.get("caption_edits") or {}
+        if any(edits.get(str(ci)) for ci in range(len(self.project["clips"]))):
+            return True
+        for c in self.project["clips"]:
+            try:
+                if Path(c["path"]).with_suffix(".srt").is_file():
+                    return True
+            except Exception:
+                pass
+        return False
+
+    def _export_tutorial(self):
+        """One-click tutorial export: 1080p landscape, H.264 at
+        CRF 23 for easy sharing, captions burned in when they were
+        generated, chapters.txt written alongside. Uses the normal
+        export flow with the tutorial preset applied."""
+        if self._exporting:
+            return
+        if not self.project["clips"]:
+            messagebox.showinfo("Export tutorial", "Add a video clip first.")
+            return
+        self._quality_var.set("1080p")
+        self._ratio_var.set("16:9  Landscape")
+        if self._captions_available():
+            self._captions_var.set(True)
+        self.project["tutorial_export"] = True
+        self._status_var.set("Exporting tutorial (1080p, H.264)…")
+        self._export()
+
     def _export(self):
         if self._exporting:
             return
@@ -7041,6 +7137,9 @@ class VideoEditor(ctk.CTkToplevel):
 
     def _export_done(self, ok, msg, out):
         self._exporting = False
+        # The tutorial preset is one-shot: a later normal Export
+        # must not re-encode.
+        self.project["tutorial_export"] = False
         self._bar.set(1.0 if ok else 0.0)
         self._status_var.set(msg)
         if ok:
